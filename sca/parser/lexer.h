@@ -76,7 +76,8 @@ enum symbol
   LT_ID,              // '<'
   LTEQ_ID,            // '<='
   GTEQ_ID,            // '>='
-  ID_ID,              // ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+  SEMICOLON_ID,       // ';'
+  ID_ID,              // ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-'|'_')*
   IntLiteral_ID,      // [0-9]+
   RealLiteral_ID,     // [0-9]+ '.' [0-9]+)? | '.' [0-9]+
   EOF_ID
@@ -135,7 +136,7 @@ public:
   token *next();
 
 private:
-  static bool is_id_part(const char &ch) { return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'); }
+  static bool is_id_part(const char &ch) { return ch == '-' || ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'); }
 
   token *mk_token(const symbol &sym)
   {
