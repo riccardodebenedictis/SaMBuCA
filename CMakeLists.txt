@@ -17,7 +17,7 @@ endif()
 
 set ( CMAKE_CXX_STANDARD 14 )
 
-file( GLOB SOURCES main.cpp sca/*.cpp )
+file( GLOB SOURCES main.cpp sca/*.cpp sca/parser/*.cpp )
 if( CMAKE_BUILD_TYPE MATCHES Debug )
   #list( APPEND SOURCES sca/listeners/socket_listener.cpp ) 
 endif()
