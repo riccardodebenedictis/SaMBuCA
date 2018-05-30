@@ -1,0 +1,2 @@
+# SaMBuCA
+ SyMBolic Connectionist Architecture
