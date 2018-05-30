@@ -1,5 +1,11 @@
 #pragma once
 
+#include <cstddef>
+#include <string>
+#include <istream>
+#include <cmath>
+#include <vector>
+
 namespace sca
 {
 
@@ -76,12 +82,88 @@ enum symbol
   EOF_ID
 };
 
+class token
+{
+public:
+  token(const symbol &sym, const size_t &start_line, const size_t &start_pos, const size_t &end_line, const size_t &end_pos) : sym(sym), start_line(start_line), start_pos(start_pos), end_line(end_line), end_pos(end_pos) {}
+  virtual ~token() {}
+
+public:
+  const symbol sym;
+  const size_t start_line;
+  const size_t start_pos;
+  const size_t end_line;
+  const size_t end_pos;
+};
+
+class id_token : public token
+{
+public:
+  id_token(const size_t &start_line, const size_t &start_pos, const size_t &end_line, const size_t &end_pos, const std::string &id) : token(ID_ID, start_line, start_pos, end_line, end_pos), id(id) {}
+  virtual ~id_token() {}
+
+public:
+  const std::string id;
+};
+
+class number_token : public token
+{
+public:
+  number_token(const size_t &start_line, const size_t &start_pos, const size_t &end_line, const size_t &end_pos, const double &val) : token(RealLiteral_ID, start_line, start_pos, end_line, end_pos), val(val) {}
+  virtual ~number_token() {}
+
+public:
+  const double val;
+};
+
 class lexer
 {
 private:
-  /* data */
+  std::string sb;
+  size_t pos = 0;
+  int ch;
+  size_t start_line = 0;
+  size_t start_pos = 0;
+  size_t end_line = 0;
+  size_t end_pos = 0;
+
 public:
-  lexer(/* args */);
-  ~lexer();
+  lexer(std::istream &is);
+  lexer(const lexer &orig) = delete;
+  virtual ~lexer();
+
+  token *next();
+
+private:
+  static bool is_id_part(const char &ch) { return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'); }
+
+  token *mk_token(const symbol &sym)
+  {
+    token *tk = new token(sym, start_line, start_pos, end_line, end_pos);
+    start_line = end_line;
+    start_pos = end_pos;
+    return tk;
+  }
+
+  token *mk_id_token(const std::string &id)
+  {
+    id_token *tk = new id_token(start_line, start_pos, end_line, end_pos, id);
+    start_line = end_line;
+    start_pos = end_pos;
+    return tk;
+  }
+
+  token *mk_number_token(const std::string &str)
+  {
+    token *tk = new number_token(start_line, start_pos, end_line, end_pos, std::stod(str));
+    start_line = end_line;
+    start_pos = end_pos;
+    return tk;
+  }
+
+  token *finish_id(std::string &str);
+
+  void error(const std::string &err);
+  int next_char();
 };
 } // namespace sca
