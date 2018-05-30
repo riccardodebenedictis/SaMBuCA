@@ -109,9 +109,122 @@ token *lexer::next()
             default:
                 error("invalid keyword..");
             }
+        case 'd':
+            switch (ch = next_char())
+            {
+            case 'o':
+                if ((ch = next_char()) != 'm' || (ch = next_char()) != 'a' || (ch = next_char()) != 'i' || (ch = next_char()) != 'n')
+                    error("invalid keyword..");
+                ch = next_char();
+                return mk_token(DOMAIN_ID);
+            case 'u':
+                if ((ch = next_char()) != 'r' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'i')
+                    error("invalid keyword..");
+                switch (ch = next_char())
+                {
+                case 'o':
+                    if ((ch = next_char()) != 'n')
+                        error("invalid keyword..");
+                    ch = next_char();
+                    return mk_token(DURATION_ID);
+                case 'v':
+                    if ((ch = next_char()) != 'e' || (ch = next_char()) != '-' || (ch = next_char()) != 'a' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n')
+                        error("invalid keyword..");
+                    ch = next_char();
+                    return mk_token(DURATIVE_ACTION_ID);
+                default:
+                    error("invalid keyword..");
+                }
+                return mk_token(CONSTRAINTS_ID);
+            default:
+                error("invalid keyword..");
+            }
+        case 'e':
+            if ((ch = next_char()) != 'f' || (ch = next_char()) != 'f' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 't')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(EFFECT_ID);
+        case 'f':
+            if ((ch = next_char()) != 'u' || (ch = next_char()) != 'n' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(FUNCTIONS_ID);
+        case 'g':
+            if ((ch = next_char()) != 'o' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(GOAL_ID);
+        case 'i':
+            if ((ch = next_char()) != 'n' || (ch = next_char()) != 'i' || (ch = next_char()) != 't')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(INIT_ID);
+        case 'm':
+            if ((ch = next_char()) != 'e' || (ch = next_char()) != 't' || (ch = next_char()) != 'r' || (ch = next_char()) != 'i' || (ch = next_char()) != 'c')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(METRIC_ID);
+        case 'o':
+            if ((ch = next_char()) != 'b' || (ch = next_char()) != 'j' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(OBJECTS_ID);
+        case 'p':
+            switch (ch = next_char())
+            {
+            case 'a':
+                if ((ch = next_char()) != 'r' || (ch = next_char()) != 'a' || (ch = next_char()) != 'm' || (ch = next_char()) != 'e' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 'r' || (ch = next_char()) != 's')
+                    error("invalid keyword..");
+                ch = next_char();
+                return mk_token(PARAMETERS_ID);
+            case 'r':
+                switch (ch = next_char())
+                {
+                case 'e':
+                    switch (ch = next_char())
+                    {
+                    case 'c':
+                        if ((ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n')
+                            error("invalid keyword..");
+                        ch = next_char();
+                        return mk_token(PRECONDITION_ID);
+                    case 'd':
+                        if ((ch = next_char()) != 'i' || (ch = next_char()) != 'c' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
+                            error("invalid keyword..");
+                        ch = next_char();
+                        return mk_token(PREDICATES_ID);
+                    default:
+                        error("invalid keyword..");
+                    }
+                case 'o':
+                    if ((ch = next_char()) != 'b' || (ch = next_char()) != 'l' || (ch = next_char()) != 'e' || (ch = next_char()) != 'm')
+                        error("invalid keyword..");
+                    ch = next_char();
+                    return mk_token(PROBLEM_ID);
+                default:
+                    error("invalid keyword..");
+                }
+            default:
+                error("invalid keyword..");
+            }
+        case 'r':
+            if ((ch = next_char()) != 'e' || (ch = next_char()) != 'q' || (ch = next_char()) != 'u' || (ch = next_char()) != 'i' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'm' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(REQUIREMENTS_ID);
+        case 't':
+            if ((ch = next_char()) != 'y' || (ch = next_char()) != 'p' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
+                error("invalid keyword..");
+            ch = next_char();
+            return mk_token(TYPES_ID);
         default:
             error("invalid keyword..");
         }
+    case '#':
+        if ((ch = next_char()) != 't')
+            error("invalid keyword..");
+        ch = next_char();
+        return mk_token(SHARP_T_ID);
     case '(':
         ch = next_char();
         return mk_token(LPAREN_ID);
