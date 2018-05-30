@@ -78,7 +78,6 @@ token *lexer::next()
                 break;
             case '.':
                 error("invalid numeric literal..");
-                return nullptr;
             default:
                 return mk_number_token(num);
             }
@@ -92,9 +91,26 @@ token *lexer::next()
                 error("invalid keyword..");
             ch = next_char();
             return mk_token(ACTION_ID);
+        case 'c':
+            if ((ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's' || (ch = next_char()) != 't')
+                error("invalid keyword..");
+            switch (ch = next_char())
+            {
+            case 'a':
+                if ((ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
+                    error("invalid keyword..");
+                ch = next_char();
+                return mk_token(CONSTANTS_ID);
+            case 'r':
+                if ((ch = next_char()) != 'a' || (ch = next_char()) != 'i' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
+                    error("invalid keyword..");
+                ch = next_char();
+                return mk_token(CONSTRAINTS_ID);
+            default:
+                error("invalid keyword..");
+            }
         default:
             error("invalid keyword..");
-            return nullptr;
         }
     case '(':
         ch = next_char();
