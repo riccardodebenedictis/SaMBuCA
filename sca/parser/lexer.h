@@ -64,6 +64,7 @@ enum symbol
   MINIMIZE_ID,        // 'minimize'
   MAXIMIZE_ID,        // 'maximize'
   TOTAL_TIME_ID,      // 'total-time'
+  SHARP_T_ID,         // '#t'
   LPAREN_ID,          // '('
   RPAREN_ID,          // ')'
   QUESTION_ID,        // '?'
