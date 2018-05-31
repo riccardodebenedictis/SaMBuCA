@@ -22,7 +22,7 @@ if( CMAKE_BUILD_TYPE MATCHES Debug )
   #list( APPEND SOURCES sca/listeners/socket_listener.cpp ) 
 endif()
 
-include_directories( sca sca/listeners )
+include_directories( sca sca/parser sca/listeners )
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )
 
@@ -31,5 +31,5 @@ if( CMAKE_BUILD_TYPE MATCHES Debug )
     target_link_libraries( ${PROJECT_NAME} wsock32 ws2_32 #[[-PROFILE]] )
   endif()
   include( CTest )
-  #add_subdirectory( sca/tests )
+  add_subdirectory( sca/parser/tests )
 endif()

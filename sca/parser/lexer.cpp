@@ -116,7 +116,7 @@ token *lexer::next()
                 if ((ch = next_char()) != 'm' || (ch = next_char()) != 'a' || (ch = next_char()) != 'i' || (ch = next_char()) != 'n')
                     error("invalid token..");
                 ch = next_char();
-                return mk_token(DOMAIN_ID);
+                return mk_token(PROBLEM_DOMAIN_ID);
             case 'u':
                 if ((ch = next_char()) != 'r' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'i')
                     error("invalid token..");
@@ -178,29 +178,20 @@ token *lexer::next()
                 ch = next_char();
                 return mk_token(PARAMETERS_ID);
             case 'r':
+                if ((ch = next_char()) != 'e')
+                    error("invalid token..");
                 switch (ch = next_char())
                 {
-                case 'e':
-                    switch (ch = next_char())
-                    {
-                    case 'c':
-                        if ((ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n')
-                            error("invalid token..");
-                        ch = next_char();
-                        return mk_token(PRECONDITION_ID);
-                    case 'd':
-                        if ((ch = next_char()) != 'i' || (ch = next_char()) != 'c' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
-                            error("invalid token..");
-                        ch = next_char();
-                        return mk_token(PREDICATES_ID);
-                    default:
-                        error("invalid token..");
-                    }
-                case 'o':
-                    if ((ch = next_char()) != 'b' || (ch = next_char()) != 'l' || (ch = next_char()) != 'e' || (ch = next_char()) != 'm')
+                case 'c':
+                    if ((ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n')
                         error("invalid token..");
                     ch = next_char();
-                    return mk_token(PROBLEM_ID);
+                    return mk_token(PRECONDITION_ID);
+                case 'd':
+                    if ((ch = next_char()) != 'i' || (ch = next_char()) != 'c' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
+                        error("invalid token..");
+                    ch = next_char();
+                    return mk_token(PREDICATES_ID);
                 default:
                     error("invalid token..");
                 }
@@ -811,34 +802,56 @@ token *lexer::next()
         if ((ch = next_char()) != 'r')
             return finish_id(str);
         str += ch;
-        if ((ch = next_char()) != 'e')
+        switch (ch = next_char())
+        {
+        case 'e':
+            str += ch;
+            if ((ch = next_char()) != 'f')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'e')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'r')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'e')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'n')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'c')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'e')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                return finish_id(str);
+            else
+                return mk_token(PREFERENCE_ID);
+        case 'o':
+            str += ch;
+            if ((ch = next_char()) != 'b')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'l')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'e')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != 'm')
+                return finish_id(str);
+            str += ch;
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                return finish_id(str);
+            else
+                return mk_token(PROBLEM_ID);
+        default:
             return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'f')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'e')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'r')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'e')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'n')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'c')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != 'e')
-            return finish_id(str);
-        str += ch;
-        if ((ch = next_char()) != -1 && is_id_part(ch))
-            return finish_id(str);
-        else
-            return mk_token(PREFERENCE_ID);
+        }
     }
     case 's':
     {
