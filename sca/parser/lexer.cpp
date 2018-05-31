@@ -96,21 +96,27 @@ token *lexer::next()
                 {
                     if ((ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 's' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(ACTION_COSTS_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(ACTION_COSTS_ID);
                 }
                 else if (!is_id_part(ch))
                 {
-                    ch = next_char();
-                    return mk_token(ACTION_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(ACTION_ID);
                 }
                 else
                     error("invalid token..");
             case 'd':
                 if ((ch = next_char()) != 'l')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(ADL_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(ADL_ID);
             default:
                 error("invalid token..");
             }
@@ -122,8 +128,10 @@ token *lexer::next()
             case 'd':
                 if ((ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != '-' || (ch = next_char()) != 'e' || (ch = next_char()) != 'f' || (ch = next_char()) != 'f' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(CONDITIONAL_EFFECTS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(CONDITIONAL_EFFECTS_ID);
             case 's':
                 if ((ch = next_char()) != 't')
                     error("invalid token..");
@@ -132,21 +140,27 @@ token *lexer::next()
                 case 'a':
                     if ((ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(CONSTANTS_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(CONSTANTS_ID);
                 case 'r':
                     if ((ch = next_char()) != 'a' || (ch = next_char()) != 'i' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(CONSTRAINTS_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(CONSTRAINTS_ID);
                 default:
                     error("invalid token..");
                 }
             case 't':
                 if ((ch = next_char()) != 'i' || (ch = next_char()) != 'n' || (ch = next_char()) != 'u' || (ch = next_char()) != 'o' || (ch = next_char()) != 'u' || (ch = next_char()) != 's' || (ch = next_char()) != '-' || (ch = next_char()) != 'e' || (ch = next_char()) != 'f' || (ch = next_char()) != 'f' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(CONTINUOUS_EFFECTS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(CONTINUOUS_EFFECTS_ID);
             default:
                 error("invalid token..");
             }
@@ -156,18 +170,24 @@ token *lexer::next()
             case 'e':
                 if ((ch = next_char()) != 'r' || (ch = next_char()) != 'i' || (ch = next_char()) != 'v' || (ch = next_char()) != 'e' || (ch = next_char()) != 'd' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 'c' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(DERIVED_PREDICATES_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(DERIVED_PREDICATES_ID);
             case 'i':
                 if ((ch = next_char()) != 's' || (ch = next_char()) != 'j' || (ch = next_char()) != 'u' || (ch = next_char()) != 'n' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'v' || (ch = next_char()) != 'e' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(DISJUNCTIVE_PRECONDITIONS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(DISJUNCTIVE_PRECONDITIONS_ID);
             case 'o':
                 if ((ch = next_char()) != 'm' || (ch = next_char()) != 'a' || (ch = next_char()) != 'i' || (ch = next_char()) != 'n')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(PROBLEM_DOMAIN_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(PROBLEM_DOMAIN_ID);
             case 'u':
                 if ((ch = next_char()) != 'r' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'i')
                     error("invalid token..");
@@ -180,13 +200,17 @@ token *lexer::next()
                     {
                         if ((ch = next_char()) != 'i' || (ch = next_char()) != 'n' || (ch = next_char()) != 'e' || (ch = next_char()) != 'q' || (ch = next_char()) != 'u' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
                             error("invalid token..");
-                        ch = next_char();
-                        return mk_token(DURATION_INEQUALITIES_ID);
+                        if ((ch = next_char()) != -1 && is_id_part(ch))
+                            error("invalid token..");
+                        else
+                            return mk_token(DURATION_INEQUALITIES_ID);
                     }
                     else if (!is_id_part(ch))
                     {
-                        ch = next_char();
-                        return mk_token(DURATION_ID);
+                        if ((ch = next_char()) != -1 && is_id_part(ch))
+                            error("invalid token..");
+                        else
+                            return mk_token(DURATION_ID);
                     }
                     else
                         error("invalid token..");
@@ -195,13 +219,17 @@ token *lexer::next()
                         error("invalid token..");
                     if ((ch = next_char()) == 's')
                     {
-                        ch = next_char();
-                        return mk_token(DURATIVE_ACTIONS_ID);
+                        if ((ch = next_char()) != -1 && is_id_part(ch))
+                            error("invalid token..");
+                        else
+                            return mk_token(DURATIVE_ACTIONS_ID);
                     }
                     else if (!is_id_part(ch))
                     {
-                        ch = next_char();
-                        return mk_token(DURATIVE_ACTION_ID);
+                        if ((ch = next_char()) != -1 && is_id_part(ch))
+                            error("invalid token..");
+                        else
+                            return mk_token(DURATIVE_ACTION_ID);
                     }
                     else
                         error("invalid token..");
@@ -218,18 +246,24 @@ token *lexer::next()
             case 'f':
                 if ((ch = next_char()) != 'f' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 't')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(EFFECT_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(EFFECT_ID);
             case 'q':
                 if ((ch = next_char()) != 'u' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'y')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(EQUALITY_ID);
-            case 'x':
-                if ((ch = next_char()) != 'i' || (ch = next_char()) != 's' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n')
+                if ((ch = next_char()) != -1 && is_id_part(ch))
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(EXISTENTIAL_PRECONDITIONS_ID);
+                else
+                    return mk_token(EQUALITY_ID);
+            case 'x':
+                if ((ch = next_char()) != 'i' || (ch = next_char()) != 's' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
+                    error("invalid token..");
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(EXISTENTIAL_PRECONDITIONS_ID);
             default:
                 error("invalid token..");
             }
@@ -239,60 +273,78 @@ token *lexer::next()
             case 'l':
                 if ((ch = next_char()) != 'u' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(FLUENTS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(FLUENTS_ID);
             case 'u':
                 if ((ch = next_char()) != 'n' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(FUNCTIONS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(FUNCTIONS_ID);
             default:
                 error("invalid token..");
             }
         case 'g':
             if ((ch = next_char()) != 'o' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(GOAL_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(GOAL_ID);
         case 'i':
             if ((ch = next_char()) != 'n' || (ch = next_char()) != 'i' || (ch = next_char()) != 't')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(INIT_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(INIT_ID);
         case 'm':
             if ((ch = next_char()) != 'e' || (ch = next_char()) != 't' || (ch = next_char()) != 'r' || (ch = next_char()) != 'i' || (ch = next_char()) != 'c')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(METRIC_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(METRIC_ID);
         case 'n':
             switch (ch = next_char())
             {
             case 'e':
                 if ((ch = next_char()) != 'g' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'v' || (ch = next_char()) != 'e' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(NEGATIVE_PRECONDITIONS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(NEGATIVE_PRECONDITIONS_ID);
             case 'u':
                 if ((ch = next_char()) != 'm' || (ch = next_char()) != 'e' || (ch = next_char()) != 'r' || (ch = next_char()) != 'i' || (ch = next_char()) != 'c' || (ch = next_char()) != '-' || (ch = next_char()) != 'f' || (ch = next_char()) != 'l' || (ch = next_char()) != 'u' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(NUMERIC_FLUENTS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(NUMERIC_FLUENTS_ID);
             default:
                 error("invalid token..");
             }
         case 'o':
             if ((ch = next_char()) != 'b' || (ch = next_char()) != 'j' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(OBJECTS_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(OBJECTS_ID);
         case 'p':
             switch (ch = next_char())
             {
             case 'a':
                 if ((ch = next_char()) != 'r' || (ch = next_char()) != 'a' || (ch = next_char()) != 'm' || (ch = next_char()) != 'e' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 'r' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(PARAMETERS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(PARAMETERS_ID);
             case 'r':
                 if ((ch = next_char()) != 'e')
                     error("invalid token..");
@@ -301,18 +353,24 @@ token *lexer::next()
                 case 'c':
                     if ((ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(PRECONDITION_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(PRECONDITION_ID);
                 case 'd':
                     if ((ch = next_char()) != 'i' || (ch = next_char()) != 'c' || (ch = next_char()) != 'a' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(PREDICATES_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(PREDICATES_ID);
                 case 'f':
                     if ((ch = next_char()) != 'e' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 'c' || (ch = next_char()) != 'e' || (ch = next_char()) != 's')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(PREFERENCES_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(PREFERENCES_ID);
                 default:
                     error("invalid token..");
                 }
@@ -322,26 +380,34 @@ token *lexer::next()
         case 'q':
             if ((ch = next_char()) != 'u' || (ch = next_char()) != 'a' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'f' || (ch = next_char()) != 'i' || (ch = next_char()) != 'e' || (ch = next_char()) != 'd' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(QUANTIFIED_PRECONDITIONS_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(QUANTIFIED_PRECONDITIONS_ID);
         case 'r':
             if ((ch = next_char()) != 'e' || (ch = next_char()) != 'q' || (ch = next_char()) != 'u' || (ch = next_char()) != 'i' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'm' || (ch = next_char()) != 'e' || (ch = next_char()) != 'n' || (ch = next_char()) != 't' || (ch = next_char()) != 's')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(REQUIREMENTS_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(REQUIREMENTS_ID);
         case 's':
             if ((ch = next_char()) != 't' || (ch = next_char()) != 'r' || (ch = next_char()) != 'i' || (ch = next_char()) != 'p' || (ch = next_char()) != 's')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(STRIPS_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(STRIPS_ID);
         case 't':
             switch (ch = next_char())
             {
             case 'i':
                 if ((ch = next_char()) != 'm' || (ch = next_char()) != 'e' || (ch = next_char()) != 'd' || (ch = next_char()) != '-' || (ch = next_char()) != 'i' || (ch = next_char()) != 'n' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != '-' || (ch = next_char()) != 'l' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'e' || (ch = next_char()) != 'r' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != 's')
                     error("invalid token..");
-                ch = next_char();
-                return mk_token(TIMED_INITIAL_LITERALS_ID);
+                if ((ch = next_char()) != -1 && is_id_part(ch))
+                    error("invalid token..");
+                else
+                    return mk_token(TIMED_INITIAL_LITERALS_ID);
             case 'y':
                 if ((ch = next_char()) != 'p')
                     error("invalid token..");
@@ -350,13 +416,17 @@ token *lexer::next()
                 case 'e':
                     if ((ch = next_char()) != 's')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(TYPES_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(TYPES_ID);
                 case 'i':
                     if ((ch = next_char()) != 'n' || (ch = next_char()) != 'g')
                         error("invalid token..");
-                    ch = next_char();
-                    return mk_token(TYPING_ID);
+                    if ((ch = next_char()) != -1 && is_id_part(ch))
+                        error("invalid token..");
+                    else
+                        return mk_token(TYPING_ID);
                 default:
                     error("invalid token..");
                 }
@@ -366,8 +436,10 @@ token *lexer::next()
         case 'u':
             if ((ch = next_char()) != 'n' || (ch = next_char()) != 'i' || (ch = next_char()) != 'v' || (ch = next_char()) != 'e' || (ch = next_char()) != 'r' || (ch = next_char()) != 's' || (ch = next_char()) != 'a' || (ch = next_char()) != 'l' || (ch = next_char()) != '-' || (ch = next_char()) != 'p' || (ch = next_char()) != 'r' || (ch = next_char()) != 'e' || (ch = next_char()) != 'c' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 'd' || (ch = next_char()) != 'i' || (ch = next_char()) != 't' || (ch = next_char()) != 'i' || (ch = next_char()) != 'o' || (ch = next_char()) != 'n' || (ch = next_char()) != 's')
                 error("invalid token..");
-            ch = next_char();
-            return mk_token(STRIPS_ID);
+            if ((ch = next_char()) != -1 && is_id_part(ch))
+                error("invalid token..");
+            else
+                return mk_token(UNIVERSAL_PRECONDITIONS_ID);
         default:
             error("invalid token..");
         }

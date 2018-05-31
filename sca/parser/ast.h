@@ -6,13 +6,24 @@ namespace sca
 namespace ast
 {
 
-class domain
+class requirement
 {
 private:
   const std::string name;
 
 public:
-  domain(const std::string &name) : name(name) {}
+  requirement(const std::string &name) : name(name) {}
+  ~requirement() {}
+};
+
+class domain
+{
+private:
+  const std::string name;
+  const std::vector<requirement *> requirements;
+
+public:
+  domain(const std::string &name, const std::vector<requirement *> &reqs) : name(name), requirements(reqs) {}
   ~domain() {}
 };
 
