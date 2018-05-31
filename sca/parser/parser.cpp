@@ -34,110 +34,17 @@ ast::domain *parser::parse_domain()
     if (!match(RPAREN_ID))
         error("expected ')'..");
 
-    while (!match(RPAREN_ID))
+    if (match(LPAREN_ID))
     {
-        if (!match(LPAREN_ID))
-            error("expected '('..");
-
-        switch (tk->sym)
-        {
-        case REQUIREMENTS_ID:
-        {
-            match(REQUIREMENTS_ID);
+        if (match(REQUIREMENTS_ID))
             do
             {
-                switch (tk->sym)
-                {
-                case STRIPS_ID:
-                    match(STRIPS_ID);
-                    reqs.push_back(new ast::requirement(":strips"));
-                    break;
-                case TYPING_ID:
-                    match(TYPING_ID);
-                    reqs.push_back(new ast::requirement(":typing"));
-                    break;
-                case NEGATIVE_PRECONDITIONS_ID:
-                    match(NEGATIVE_PRECONDITIONS_ID);
-                    reqs.push_back(new ast::requirement(":negative-preconditions"));
-                    break;
-                case DISJUNCTIVE_PRECONDITIONS_ID:
-                    match(DISJUNCTIVE_PRECONDITIONS_ID);
-                    reqs.push_back(new ast::requirement(":disjunctive-preconditions"));
-                    break;
-                case EQUALITY_ID:
-                    match(EQUALITY_ID);
-                    reqs.push_back(new ast::requirement(":equality"));
-                    break;
-                case EXISTENTIAL_PRECONDITIONS_ID:
-                    match(EXISTENTIAL_PRECONDITIONS_ID);
-                    reqs.push_back(new ast::requirement(":existential-preconditions"));
-                    break;
-                case UNIVERSAL_PRECONDITIONS_ID:
-                    match(UNIVERSAL_PRECONDITIONS_ID);
-                    reqs.push_back(new ast::requirement(":universal-preconditions"));
-                    break;
-                case QUANTIFIED_PRECONDITIONS_ID:
-                    match(QUANTIFIED_PRECONDITIONS_ID);
-                    reqs.push_back(new ast::requirement(":quantified-preconditions"));
-                    break;
-                case CONDITIONAL_EFFECTS_ID:
-                    match(CONDITIONAL_EFFECTS_ID);
-                    reqs.push_back(new ast::requirement(":conditional-effects"));
-                    break;
-                case FLUENTS_ID:
-                    match(FLUENTS_ID);
-                    reqs.push_back(new ast::requirement(":fluents"));
-                    break;
-                case NUMERIC_FLUENTS_ID:
-                    match(NUMERIC_FLUENTS_ID);
-                    reqs.push_back(new ast::requirement(":numeric-fluents"));
-                    break;
-                case ADL_ID:
-                    match(ADL_ID);
-                    reqs.push_back(new ast::requirement(":adl"));
-                    break;
-                case DURATIVE_ACTIONS_ID:
-                    match(DURATIVE_ACTIONS_ID);
-                    reqs.push_back(new ast::requirement(":durative-actions"));
-                    break;
-                case DURATION_INEQUALITIES_ID:
-                    match(DURATION_INEQUALITIES_ID);
-                    reqs.push_back(new ast::requirement(":duration-inequalities"));
-                    break;
-                case CONTINUOUS_EFFECTS_ID:
-                    match(CONTINUOUS_EFFECTS_ID);
-                    reqs.push_back(new ast::requirement(":continuous-effects"));
-                    break;
-                case DERIVED_PREDICATES_ID:
-                    match(DERIVED_PREDICATES_ID);
-                    reqs.push_back(new ast::requirement(":derived-predicates"));
-                    break;
-                case TIMED_INITIAL_LITERALS_ID:
-                    match(TIMED_INITIAL_LITERALS_ID);
-                    reqs.push_back(new ast::requirement(":timed-initial-literals"));
-                    break;
-                case PREFERENCES_ID:
-                    match(PREFERENCES_ID);
-                    reqs.push_back(new ast::requirement(":preferences"));
-                    break;
-                case CONSTRAINTS_ID:
-                    match(CONSTRAINTS_ID);
-                    reqs.push_back(new ast::requirement(":constraints"));
-                    break;
-                case ACTION_COSTS_ID:
-                    match(ACTION_COSTS_ID);
-                    reqs.push_back(new ast::requirement(":action-costs"));
-                    break;
-                default:
-                    error("expected either ':strips' or ':typing' or ':negative-preconditions' or ':disjunctive-preconditions' or ':equality' or ':existential-preconditions' or ':universal-preconditions' or ':quantified-preconditions' or ':conditional-effects' or ':fluents' or ':numeric-fluents' or ':adl' or ':durative-actions' or ':duration-inequalities' or ':conditional-effects' or ':derived-predicates' or ':timed-initial-literals' or ':preferences' or ':constraints' or ':action-costs'..");
-                }
+                reqs.push_back(req_def());
             } while (!match(RPAREN_ID));
-            break;
-        }
-        default:
-            error("expected either '(' or ')'..");
-        }
     }
+
+    if (!match(RPAREN_ID))
+        error("expected ')'..");
 
     return new ast::domain(n, reqs);
 }
@@ -148,6 +55,7 @@ ast::problem *parser::parse_problem()
 
     std::string dn;
     std::string pn;
+    std::vector<ast::requirement *> reqs;
 
     if (!match(LPAREN_ID))
         error("expected '('..");
@@ -181,10 +89,88 @@ ast::problem *parser::parse_problem()
     if (!match(RPAREN_ID))
         error("expected ')'..");
 
+    if (match(LPAREN_ID))
+    {
+        if (match(REQUIREMENTS_ID))
+            do
+            {
+                reqs.push_back(req_def());
+            } while (!match(RPAREN_ID));
+    }
+
     if (!match(RPAREN_ID))
         error("expected ')'..");
 
     return new ast::problem(pn, dn);
+}
+
+ast::requirement *parser::req_def()
+{
+    switch (tk->sym)
+    {
+    case STRIPS_ID:
+        match(STRIPS_ID);
+        return new ast::requirement(":strips");
+    case TYPING_ID:
+        match(TYPING_ID);
+        return new ast::requirement(":typing");
+    case NEGATIVE_PRECONDITIONS_ID:
+        match(NEGATIVE_PRECONDITIONS_ID);
+        return new ast::requirement(":negative-preconditions");
+    case DISJUNCTIVE_PRECONDITIONS_ID:
+        match(DISJUNCTIVE_PRECONDITIONS_ID);
+        return new ast::requirement(":disjunctive-preconditions");
+    case EQUALITY_ID:
+        match(EQUALITY_ID);
+        return new ast::requirement(":equality");
+    case EXISTENTIAL_PRECONDITIONS_ID:
+        match(EXISTENTIAL_PRECONDITIONS_ID);
+        return new ast::requirement(":existential-preconditions");
+    case UNIVERSAL_PRECONDITIONS_ID:
+        match(UNIVERSAL_PRECONDITIONS_ID);
+        return new ast::requirement(":universal-preconditions");
+    case QUANTIFIED_PRECONDITIONS_ID:
+        match(QUANTIFIED_PRECONDITIONS_ID);
+        return new ast::requirement(":quantified-preconditions");
+    case CONDITIONAL_EFFECTS_ID:
+        match(CONDITIONAL_EFFECTS_ID);
+        return new ast::requirement(":conditional-effects");
+    case FLUENTS_ID:
+        match(FLUENTS_ID);
+        return new ast::requirement(":fluents");
+    case NUMERIC_FLUENTS_ID:
+        match(NUMERIC_FLUENTS_ID);
+        return new ast::requirement(":numeric-fluents");
+    case ADL_ID:
+        match(ADL_ID);
+        return new ast::requirement(":adl");
+    case DURATIVE_ACTIONS_ID:
+        match(DURATIVE_ACTIONS_ID);
+        return new ast::requirement(":durative-actions");
+    case DURATION_INEQUALITIES_ID:
+        match(DURATION_INEQUALITIES_ID);
+        return new ast::requirement(":duration-inequalities");
+    case CONTINUOUS_EFFECTS_ID:
+        match(CONTINUOUS_EFFECTS_ID);
+        return new ast::requirement(":continuous-effects");
+    case DERIVED_PREDICATES_ID:
+        match(DERIVED_PREDICATES_ID);
+        return new ast::requirement(":derived-predicates");
+    case TIMED_INITIAL_LITERALS_ID:
+        match(TIMED_INITIAL_LITERALS_ID);
+        return new ast::requirement(":timed-initial-literals");
+    case PREFERENCES_ID:
+        match(PREFERENCES_ID);
+        return new ast::requirement(":preferences");
+    case CONSTRAINTS_ID:
+        match(CONSTRAINTS_ID);
+        return new ast::requirement(":constraints");
+    case ACTION_COSTS_ID:
+        match(ACTION_COSTS_ID);
+        return new ast::requirement(":action-costs");
+    default:
+        error("expected either ':strips' or ':typing' or ':negative-preconditions' or ':disjunctive-preconditions' or ':equality' or ':existential-preconditions' or ':universal-preconditions' or ':quantified-preconditions' or ':conditional-effects' or ':fluents' or ':numeric-fluents' or ':adl' or ':durative-actions' or ':duration-inequalities' or ':conditional-effects' or ':derived-predicates' or ':timed-initial-literals' or ':preferences' or ':constraints' or ':action-costs'..");
+    }
 }
 
 token *parser::next()

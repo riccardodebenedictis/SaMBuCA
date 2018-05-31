@@ -8,6 +8,7 @@ namespace sca
 
 namespace ast
 {
+class requirement;
 class domain;
 class problem;
 } // namespace ast
@@ -32,6 +33,8 @@ private:
   token *next();
   bool match(const symbol &sym);
   void backtrack(const size_t &p);
+
+  ast::requirement *req_def();
 
   void error(const std::string &err);
 };
