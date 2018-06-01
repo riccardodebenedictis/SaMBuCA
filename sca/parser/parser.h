@@ -1,21 +1,15 @@
 #pragma once
 
 #include "lexer.h"
+#include "ast.h"
 #include <vector>
 
 namespace sca
 {
 
-namespace ast
-{
-class requirement;
-class domain;
-class problem;
-} // namespace ast
-
 class parser
 {
-private:
+protected:
   lexer lex;                // the current lexer..
   token *tk = nullptr;      // the current lookahead token..
   std::vector<token *> tks; // all the tokens parsed so far..
@@ -26,10 +20,9 @@ public:
   parser(const parser &orig) = delete;
   virtual ~parser();
 
-  ast::domain *parse_domain();
-  ast::problem *parse_problem();
+  virtual ast::compilation_unit *parse() = 0;
 
-private:
+protected:
   token *next();
   bool match(const symbol &sym);
   void backtrack(const size_t &p);
@@ -37,5 +30,28 @@ private:
   ast::requirement *req_def();
 
   void error(const std::string &err);
+};
+
+class domain_parser : public parser
+{
+public:
+  domain_parser(std::istream &is);
+  domain_parser(const domain_parser &orig) = delete;
+  virtual ~domain_parser();
+
+  ast::domain *parse() override;
+};
+
+class problem_parser : public parser
+{
+private:
+  ast::domain &dom;
+
+public:
+  problem_parser(std::istream &is, ast::domain &dom);
+  problem_parser(const problem_parser &orig) = delete;
+  virtual ~problem_parser();
+
+  ast::problem *parse() override;
 };
 } // namespace sca

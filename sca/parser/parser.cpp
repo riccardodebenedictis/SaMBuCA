@@ -1,5 +1,4 @@
 #include "parser.h"
-#include "ast.h"
 #include <algorithm>
 
 namespace sca
@@ -8,153 +7,6 @@ namespace sca
 parser::parser(std::istream &is) : lex(is) {}
 
 parser::~parser() {}
-
-ast::domain *parser::parse_domain()
-{
-    tk = next();
-
-    std::string n;
-    std::vector<ast::requirement *> reqs;
-    std::map<std::string, ast::type *> tps;
-
-    if (!match(LPAREN_ID))
-        error("expected '('..");
-
-    if (!match(DEFINE_ID))
-        error("expected 'define'..");
-
-    if (!match(LPAREN_ID))
-        error("expected '('..");
-
-    if (!match(DOMAIN_ID))
-        error("expected 'domain'..");
-
-    if (!match(ID_ID))
-        error("expected identifier..");
-    n = static_cast<id_token *>(tks[pos - 2])->id;
-
-    if (!match(RPAREN_ID))
-        error("expected ')'..");
-
-    size_t c_pos = pos;
-    if (match(LPAREN_ID))
-        if (match(REQUIREMENTS_ID)) // the domain requirements..
-            do
-            {
-                reqs.push_back(req_def());
-            } while (!match(RPAREN_ID));
-        else
-            backtrack(c_pos);
-
-    if (match(LPAREN_ID))
-        if (match(TYPES_ID)) // the domain types..
-        {
-            if (std::none_of(reqs.begin(), reqs.end(), [](ast::requirement *r) { return r->get_name() == ":typing"; }))
-                error("expected ':typing' requirement..");
-
-            ast::type *o_tp = new ast::type("object");
-            tps.insert({o_tp->get_name(), o_tp});
-            std::vector<ast::type *> c_tps;
-            while (!match(RPAREN_ID))
-            {
-                if (!match(ID_ID))
-                    error("expected identifier..");
-                std::string tn = static_cast<id_token *>(tks[pos - 2])->id;
-                auto c_tp = tps.find(tn);
-                if (c_tp == tps.end())
-                    c_tp = tps.insert({tn, new ast::type(tn)}).first;
-                c_tps.push_back((*c_tp).second);
-
-                if (match(MINUS_ID)) // we have a supertype..
-                {
-                    if (match(OBJECT_ID))
-                    {
-                        for (ast::type *t : c_tps)
-                            t->supertype = o_tp;
-                        c_tps.clear();
-                    }
-                    else
-                    {
-                        if (!match(ID_ID))
-                            error("expected identifier..");
-                        std::string stn = static_cast<id_token *>(tks[pos - 2])->id;
-                        auto c_st = tps.find(stn);
-                        if (c_st == tps.end())
-                            c_st = tps.insert({stn, new ast::type(stn)}).first;
-
-                        for (ast::type *t : c_tps)
-                            t->supertype = (*c_st).second;
-                        c_tps.clear();
-                    }
-                }
-            }
-            for (ast::type *t : c_tps)
-                t->supertype = o_tp;
-        }
-        else
-            backtrack(c_pos);
-
-    if (!match(RPAREN_ID))
-        error("expected ')'..");
-
-    return new ast::domain(n, reqs, tps);
-}
-
-ast::problem *parser::parse_problem()
-{
-    tk = next();
-
-    std::string dn;
-    std::string pn;
-    std::vector<ast::requirement *> reqs;
-
-    if (!match(LPAREN_ID))
-        error("expected '('..");
-
-    if (!match(DEFINE_ID))
-        error("expected 'define'..");
-
-    if (!match(LPAREN_ID))
-        error("expected '('..");
-
-    if (!match(PROBLEM_ID))
-        error("expected 'domain'..");
-
-    if (!match(ID_ID))
-        error("expected identifier..");
-    pn = static_cast<id_token *>(tks[pos - 2])->id;
-
-    if (!match(RPAREN_ID))
-        error("expected ')'..");
-
-    if (!match(LPAREN_ID))
-        error("expected '('..");
-
-    if (!match(PROBLEM_DOMAIN_ID))
-        error("expected 'domain'..");
-
-    if (!match(ID_ID))
-        error("expected identifier..");
-    dn = static_cast<id_token *>(tks[pos - 2])->id;
-
-    if (!match(RPAREN_ID))
-        error("expected ')'..");
-
-    size_t c_pos = pos;
-    if (match(LPAREN_ID))
-        if (match(REQUIREMENTS_ID)) // the problem requirements..
-            do
-            {
-                reqs.push_back(req_def());
-            } while (!match(RPAREN_ID));
-        else
-            backtrack(c_pos);
-
-    if (!match(RPAREN_ID))
-        error("expected ')'..");
-
-    return new ast::problem(pn, dn);
-}
 
 ast::requirement *parser::req_def()
 {
@@ -253,4 +105,227 @@ void parser::backtrack(const size_t &p)
 }
 
 void parser::error(const std::string &err) { throw std::invalid_argument("[" + std::to_string(tk->start_line) + ", " + std::to_string(tk->start_pos) + "] " + err); }
+
+domain_parser::domain_parser(std::istream &is) : parser(is) {}
+
+domain_parser::~domain_parser() {}
+
+ast::domain *domain_parser::parse()
+{
+    tk = next();
+
+    std::string n;
+    std::vector<ast::requirement *> reqs;
+    std::map<std::string, ast::type *> tps;
+    std::map<std::string, ast::constant *> cnsts;
+
+    if (!match(LPAREN_ID))
+        error("expected '('..");
+
+    if (!match(DEFINE_ID))
+        error("expected 'define'..");
+
+    if (!match(LPAREN_ID))
+        error("expected '('..");
+
+    if (!match(DOMAIN_ID))
+        error("expected 'domain'..");
+
+    if (!match(ID_ID))
+        error("expected identifier..");
+    n = static_cast<id_token *>(tks[pos - 2])->id;
+
+    if (!match(RPAREN_ID))
+        error("expected ')'..");
+
+    size_t c_pos = pos;
+    if (match(LPAREN_ID))
+        if (match(REQUIREMENTS_ID)) // the domain requirements..
+            do
+            {
+                reqs.push_back(req_def());
+            } while (!match(RPAREN_ID));
+        else
+            backtrack(c_pos);
+
+    if (match(LPAREN_ID))
+        if (match(TYPES_ID)) // the domain types..
+        {
+            if (std::none_of(reqs.begin(), reqs.end(), [](ast::requirement *r) { return r->get_name() == ":typing"; }))
+                error("expected ':typing' requirement..");
+
+            ast::type *o_tp = new ast::type("object");
+            tps.insert({o_tp->get_name(), o_tp});
+            std::vector<ast::type *> c_tps;
+            while (!match(RPAREN_ID))
+            {
+                if (!match(ID_ID))
+                    error("expected identifier..");
+                std::string tn = static_cast<id_token *>(tks[pos - 2])->id;
+                auto c_tp = tps.find(tn);
+                if (c_tp == tps.end())
+                    c_tp = tps.insert({tn, new ast::type(tn)}).first;
+                c_tps.push_back((*c_tp).second);
+
+                if (match(MINUS_ID)) // we have a supertype..
+                    if (match(OBJECT_ID))
+                    {
+                        for (ast::type *t : c_tps)
+                            t->supertype = o_tp;
+                        c_tps.clear();
+                    }
+                    else
+                    {
+                        if (!match(ID_ID))
+                            error("expected identifier..");
+                        std::string stn = static_cast<id_token *>(tks[pos - 2])->id;
+                        auto c_st = tps.find(stn);
+                        if (c_st == tps.end())
+                            c_st = tps.insert({stn, new ast::type(stn)}).first;
+
+                        for (ast::type *t : c_tps)
+                            t->supertype = (*c_st).second;
+                        c_tps.clear();
+                    }
+            }
+            for (ast::type *t : c_tps)
+                t->supertype = o_tp;
+        }
+        else
+            backtrack(c_pos);
+
+    if (match(LPAREN_ID))
+        if (match(CONSTANTS_ID)) // the domain constants..
+        {
+            ast::type &o_tp = *tps["object"];
+            std::vector<std::string> c_cnsts;
+            while (!match(RPAREN_ID))
+            {
+                if (!match(ID_ID))
+                    error("expected identifier..");
+                c_cnsts.push_back(static_cast<id_token *>(tks[pos - 2])->id);
+
+                if (match(MINUS_ID)) // we have a supertype..
+                    if (match(OBJECT_ID))
+                    {
+                        for (const std::string &cnt : c_cnsts)
+                            cnsts.insert({cnt, new ast::constant(cnt, o_tp)});
+                        c_cnsts.clear();
+                    }
+                    else
+                    {
+                        if (!match(ID_ID))
+                            error("expected identifier..");
+                        std::string ctn = static_cast<id_token *>(tks[pos - 2])->id;
+                        for (const std::string &cnt : c_cnsts)
+                            cnsts.insert({cnt, new ast::constant(cnt, *tps[ctn])});
+                        c_cnsts.clear();
+                    }
+            }
+            for (const std::string &cnt : c_cnsts)
+                cnsts.insert({cnt, new ast::constant(cnt, o_tp)});
+        }
+        else
+            backtrack(c_pos);
+
+    if (!match(RPAREN_ID))
+        error("expected ')'..");
+
+    return new ast::domain(n, reqs, tps, cnsts);
+}
+
+problem_parser::problem_parser(std::istream &is, ast::domain &dom) : parser(is), dom(dom) {}
+
+problem_parser::~problem_parser() {}
+
+ast::problem *problem_parser::parse()
+{
+    tk = next();
+
+    std::string dn;
+    std::string pn;
+    std::vector<ast::requirement *> reqs;
+    std::map<std::string, ast::object *> objcts;
+
+    if (!match(LPAREN_ID))
+        error("expected '('..");
+
+    if (!match(DEFINE_ID))
+        error("expected 'define'..");
+
+    if (!match(LPAREN_ID))
+        error("expected '('..");
+
+    if (!match(PROBLEM_ID))
+        error("expected 'domain'..");
+
+    if (!match(ID_ID))
+        error("expected identifier..");
+    pn = static_cast<id_token *>(tks[pos - 2])->id;
+
+    if (!match(RPAREN_ID))
+        error("expected ')'..");
+
+    if (!match(LPAREN_ID))
+        error("expected '('..");
+
+    if (!match(PROBLEM_DOMAIN_ID))
+        error("expected 'domain'..");
+
+    if (!match(ID_ID))
+        error("expected identifier..");
+    dn = static_cast<id_token *>(tks[pos - 2])->id;
+
+    if (!match(RPAREN_ID))
+        error("expected ')'..");
+
+    size_t c_pos = pos;
+    if (match(LPAREN_ID))
+        if (match(REQUIREMENTS_ID)) // the problem requirements..
+            do
+            {
+                reqs.push_back(req_def());
+            } while (!match(RPAREN_ID));
+        else
+            backtrack(c_pos);
+
+    if (match(LPAREN_ID))
+        if (match(OBJECTS_ID)) // the problem objects..
+        {
+            ast::type &o_tp = dom.get_type("object");
+            std::vector<std::string> c_objcts;
+            while (!match(RPAREN_ID))
+            {
+                if (!match(ID_ID))
+                    error("expected identifier..");
+                c_objcts.push_back(static_cast<id_token *>(tks[pos - 2])->id);
+
+                if (match(MINUS_ID)) // we have a supertype..
+                    if (match(OBJECT_ID))
+                    {
+                        for (const std::string &cnt : c_objcts)
+                            objcts.insert({cnt, new ast::object(cnt, o_tp)});
+                        c_objcts.clear();
+                    }
+                    else
+                    {
+                        if (!match(ID_ID))
+                            error("expected identifier..");
+                        std::string ctn = static_cast<id_token *>(tks[pos - 2])->id;
+                        for (const std::string &cnt : c_objcts)
+                            objcts.insert({cnt, new ast::object(cnt, dom.get_type(ctn))});
+                        c_objcts.clear();
+                    }
+            }
+            for (const std::string &cnt : c_objcts)
+                objcts.insert({cnt, new ast::object(cnt, o_tp)});
+        }
+        else
+            backtrack(c_pos);
+
+    if (!match(RPAREN_ID))
+        error("expected ')'..");
+
+    return new ast::problem(pn, dn);
+}
 } // namespace sca
