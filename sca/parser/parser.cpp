@@ -77,6 +77,40 @@ ast::requirement *parser::req_def()
     }
 }
 
+std::map<std::string, ast::variable *> parser::typed_list_variable(const std::map<std::string, ast::type *> &tps)
+{
+    ast::type &o_tp = *tps.at("object");
+    std::vector<std::string> c_vars;
+    std::map<std::string, ast::variable *> vars;
+    while (!match(RPAREN_ID))
+    {
+        if (!match(ID_ID))
+            error("expected identifier..");
+        c_vars.push_back(static_cast<id_token *>(tks[pos - 2])->id);
+
+        if (match(MINUS_ID)) // we have a supertype..
+            if (match(OBJECT_ID))
+            {
+                for (const std::string &var : c_vars)
+                    vars.insert({var, new ast::variable(var, o_tp)});
+                c_vars.clear();
+            }
+            else
+            {
+                if (!match(ID_ID))
+                    error("expected identifier..");
+                std::string ctn = static_cast<id_token *>(tks[pos - 2])->id;
+                for (const std::string &var : c_vars)
+                    vars.insert({var, new ast::variable(var, *tps.at(ctn))});
+                c_vars.clear();
+            }
+    }
+    backtrack(pos - 1);
+    for (const std::string &var : c_vars)
+        vars.insert({var, new ast::variable(var, o_tp)});
+    return vars;
+}
+
 token *parser::next()
 {
     while (pos >= tks.size())

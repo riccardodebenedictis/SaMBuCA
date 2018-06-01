@@ -86,6 +86,20 @@ public:
   ~object() {}
 };
 
+class variable
+{
+private:
+  const std::string name;
+  const type &tp;
+
+public:
+  variable(const std::string &n, const type &tp) : name(n), tp(tp) {}
+  ~variable() {}
+
+  std::string get_name() const { return name; }
+  const type &get_type() const { return tp; }
+};
+
 class domain : public compilation_unit
 {
 private:
