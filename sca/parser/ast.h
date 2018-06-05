@@ -115,6 +115,23 @@ public:
   variable &get_variable(const std::string &n) const { return *variables.at(n); }
 };
 
+class function
+{
+private:
+  const std::string name;
+  const std::map<std::string, variable *> variables;
+  const type &tp;
+
+public:
+  function(const std::string &n, const std::map<std::string, variable *> &vars, const type &tp);
+  ~function();
+
+  std::string get_name() const { return name; }
+  std::map<std::string, variable *> get_variables() const { return variables; }
+  variable &get_variable(const std::string &n) const { return *variables.at(n); }
+  const type &get_type() const { return tp; }
+};
+
 class domain : public compilation_unit
 {
 private:
@@ -122,9 +139,10 @@ private:
   const std::map<std::string, type *> types;
   const std::map<std::string, constant *> constants;
   const std::map<std::string, predicate *> predicates;
+  const std::map<std::string, function *> functions;
 
 public:
-  domain(const std::string &name, const std::vector<requirement *> &reqs, const std::map<std::string, type *> &tps, const std::map<std::string, constant *> &cnsts, const std::map<std::string, predicate *> preds);
+  domain(const std::string &name, const std::vector<requirement *> &reqs, const std::map<std::string, type *> &tps, const std::map<std::string, constant *> &cnsts, const std::map<std::string, predicate *> preds, const std::map<std::string, function *> fncs);
   ~domain();
 
   std::vector<requirement *> const get_requirements() { return requirements; }
@@ -134,6 +152,8 @@ public:
   constant &get_constant(const std::string &n) const { return *constants.at(n); }
   std::map<std::string, predicate *> get_predicates() const { return predicates; }
   predicate &get_predicate(const std::string &n) const { return *predicates.at(n); }
+  std::map<std::string, function *> get_functions() const { return functions; }
+  function &get_function(const std::string &n) const { return *functions.at(n); }
 };
 
 class problem : public compilation_unit

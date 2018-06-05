@@ -37,7 +37,14 @@ predicate::~predicate()
         delete v.second;
 }
 
-domain::domain(const std::string &name, const std::vector<requirement *> &reqs, const std::map<std::string, type *> &tps, const std::map<std::string, constant *> &cnsts, const std::map<std::string, predicate *> preds) : compilation_unit(name), requirements(reqs), types(tps), constants(cnsts), predicates(preds) {}
+function::function(const std::string &n, const std::map<std::string, variable *> &vars, const type &tp) : name(n), variables(vars), tp(tp) {}
+function::~function()
+{
+    for (auto &&v : variables)
+        delete v.second;
+}
+
+domain::domain(const std::string &name, const std::vector<requirement *> &reqs, const std::map<std::string, type *> &tps, const std::map<std::string, constant *> &cnsts, const std::map<std::string, predicate *> preds, const std::map<std::string, function *> fncs) : compilation_unit(name), requirements(reqs), types(tps), constants(cnsts), predicates(preds), functions(fncs) {}
 domain::~domain()
 {
     for (auto &&r : requirements)
@@ -48,6 +55,8 @@ domain::~domain()
         delete c.second;
     for (auto &&p : predicates)
         delete p.second;
+    for (auto &&f : functions)
+        delete f.second;
 }
 
 problem::problem(const std::string &problem_name, std::string &domain_name) : compilation_unit(problem_name), domain_name(domain_name) {}

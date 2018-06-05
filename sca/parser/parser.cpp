@@ -154,6 +154,7 @@ ast::domain *domain_parser::parse()
     std::map<std::string, ast::type *> tps;
     std::map<std::string, ast::constant *> cnsts;
     std::map<std::string, ast::predicate *> preds;
+    std::map<std::string, ast::function *> fncs;
 
     if (!match(LPAREN_ID))
         error("expected '('..");
@@ -193,6 +194,8 @@ ast::domain *domain_parser::parse()
 
             ast::type *o_tp = new ast::type("object");
             tps.insert({o_tp->get_name(), o_tp});
+            ast::type *n_tp = new ast::type("number");
+            tps.insert({n_tp->get_name(), n_tp});
             std::vector<ast::type *> c_tps;
             while (!match(RPAREN_ID))
             {
@@ -243,7 +246,7 @@ ast::domain *domain_parser::parse()
                     error("expected identifier..");
                 c_cnsts.push_back(static_cast<id_token *>(tks[pos - 2])->id);
 
-                if (match(MINUS_ID)) // we have a supertype..
+                if (match(MINUS_ID)) // we have the type of the constant..
                     if (match(OBJECT_ID))
                     {
                         for (const std::string &cnt : c_cnsts)
@@ -285,10 +288,53 @@ ast::domain *domain_parser::parse()
         else
             backtrack(c_pos);
 
+    c_pos = pos;
+    if (match(LPAREN_ID))
+        if (match(FUNCTIONS_ID)) // the domain functions..
+        {
+            ast::type &o_tp = *tps["object"];
+            std::vector<std::string> c_fnms;
+            std::vector<std::map<std::string, ast::variable *>> c_vars;
+            do
+            {
+                if (!match(LPAREN_ID))
+                    error("expected '('..");
+                if (!match(ID_ID))
+                    error("expected identifier..");
+                c_fnms.push_back(static_cast<id_token *>(tks[pos - 2])->id);
+                c_vars.push_back(typed_list_variable(tps));
+                if (!match(RPAREN_ID))
+                    error("expected ')'..");
+
+                if (match(MINUS_ID)) // we have the type of the function..
+                    if (match(OBJECT_ID))
+                    {
+                        for (size_t i = 0; i < c_fnms.size(); i++)
+                            fncs.insert({c_fnms.at(i), new ast::function(c_fnms.at(i), c_vars.at(i), o_tp)});
+
+                        c_fnms.clear();
+                        c_vars.clear();
+                    }
+                    else
+                    {
+                        if (!match(ID_ID))
+                            error("expected identifier..");
+                        std::string ctn = static_cast<id_token *>(tks[pos - 2])->id;
+                        for (size_t i = 0; i < c_fnms.size(); i++)
+                            fncs.insert({c_fnms.at(i), new ast::function(c_fnms.at(i), c_vars.at(i), *tps.at(ctn))});
+
+                        c_fnms.clear();
+                        c_vars.clear();
+                    }
+            } while (!match(RPAREN_ID));
+        }
+        else
+            backtrack(c_pos);
+
     if (!match(RPAREN_ID))
         error("expected ')'..");
 
-    return new ast::domain(n, reqs, tps, cnsts, preds);
+    return new ast::domain(n, reqs, tps, cnsts, preds, fncs);
 }
 
 problem_parser::problem_parser(std::istream &is, ast::domain &dom) : parser(is), dom(dom) {}
