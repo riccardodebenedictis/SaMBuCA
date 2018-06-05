@@ -74,6 +74,7 @@ ast::requirement *parser::req_def()
         return new ast::requirement(":action-costs");
     default:
         error("expected either ':strips' or ':typing' or ':negative-preconditions' or ':disjunctive-preconditions' or ':equality' or ':existential-preconditions' or ':universal-preconditions' or ':quantified-preconditions' or ':conditional-effects' or ':fluents' or ':numeric-fluents' or ':adl' or ':durative-actions' or ':duration-inequalities' or ':conditional-effects' or ':derived-predicates' or ':timed-initial-literals' or ':preferences' or ':constraints' or ':action-costs'..");
+        return nullptr;
     }
 }
 
