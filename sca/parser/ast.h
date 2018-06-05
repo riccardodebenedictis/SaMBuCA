@@ -20,8 +20,8 @@ private:
   const std::string name;
 
 public:
-  compilation_unit(const std::string &name) : name(name) {}
-  ~compilation_unit() {}
+  compilation_unit(const std::string &name);
+  ~compilation_unit();
 
   std::string get_name() const { return name; }
 };
@@ -32,8 +32,8 @@ private:
   const std::string name;
 
 public:
-  requirement(const std::string &name) : name(name) {}
-  ~requirement() {}
+  requirement(const std::string &name);
+  ~requirement();
 
   std::string get_name() const { return name; }
 };
@@ -49,8 +49,8 @@ private:
   std::map<std::string, instance *> instances;
 
 public:
-  type(const std::string &name) : name(name) {}
-  ~type() {}
+  type(const std::string &name);
+  ~type();
 
   std::string get_name() const { return name; }
   type *get_supertype() const { return supertype; }
@@ -65,8 +65,8 @@ private:
   const type &tp;
 
 public:
-  instance(const std::string &n, type &tp) : name(n), tp(tp) { tp.instances.insert({n, this}); }
-  ~instance() {}
+  instance(const std::string &n, type &tp);
+  virtual ~instance();
 
   std::string get_name() const { return name; }
   const type &get_type() const { return tp; }
@@ -75,15 +75,15 @@ public:
 class constant : public instance
 {
 public:
-  constant(const std::string &name, type &tp) : instance(name, tp) {}
-  ~constant() {}
+  constant(const std::string &name, type &tp);
+  ~constant() override;
 };
 
 class object : public instance
 {
 public:
-  object(const std::string &name, type &tp) : instance(name, tp) {}
-  ~object() {}
+  object(const std::string &name, type &tp);
+  ~object() override;
 };
 
 class variable
@@ -93,8 +93,8 @@ private:
   const type &tp;
 
 public:
-  variable(const std::string &n, const type &tp) : name(n), tp(tp) {}
-  ~variable() {}
+  variable(const std::string &n, const type &tp);
+  ~variable();
 
   std::string get_name() const { return name; }
   const type &get_type() const { return tp; }
@@ -107,8 +107,8 @@ private:
   const std::map<std::string, variable *> variables;
 
 public:
-  predicate(const std::string &n, const std::map<std::string, variable *> &vars) : name(n), variables(vars) {}
-  ~predicate() {}
+  predicate(const std::string &n, const std::map<std::string, variable *> &vars);
+  ~predicate();
 
   std::string get_name() const { return name; }
   std::map<std::string, variable *> get_variables() const { return variables; }
@@ -124,8 +124,8 @@ private:
   const std::map<std::string, predicate *> predicates;
 
 public:
-  domain(const std::string &name, const std::vector<requirement *> &reqs, const std::map<std::string, type *> &tps, const std::map<std::string, constant *> &cnsts, const std::map<std::string, predicate *> preds) : compilation_unit(name), requirements(reqs), types(tps), constants(cnsts), predicates(preds) {}
-  ~domain() {}
+  domain(const std::string &name, const std::vector<requirement *> &reqs, const std::map<std::string, type *> &tps, const std::map<std::string, constant *> &cnsts, const std::map<std::string, predicate *> preds);
+  ~domain();
 
   std::vector<requirement *> const get_requirements() { return requirements; }
   std::map<std::string, type *> get_types() const { return types; }
@@ -142,8 +142,8 @@ private:
   const std::string domain_name;
 
 public:
-  problem(const std::string &problem_name, std::string &domain_name) : compilation_unit(problem_name), domain_name(domain_name) {}
-  ~problem() {}
+  problem(const std::string &problem_name, std::string &domain_name);
+  ~problem();
 
   std::string get_domain_name() const { return domain_name; }
 };
