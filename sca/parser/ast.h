@@ -105,31 +105,29 @@ class predicate
 {
 private:
   const std::string name;
-  const std::map<std::string, variable *> variables;
+  const std::vector<variable *> variables;
 
 public:
-  predicate(const std::string &n, const std::map<std::string, variable *> &vars);
+  predicate(const std::string &n, const std::vector<variable *> &vars);
   ~predicate();
 
   std::string get_name() const { return name; }
-  std::map<std::string, variable *> get_variables() const { return variables; }
-  variable &get_variable(const std::string &n) const { return *variables.at(n); }
+  std::vector<variable *> get_variables() const { return variables; }
 };
 
 class function
 {
 private:
   const std::string name;
-  const std::map<std::string, variable *> variables;
+  const std::vector<variable *> variables;
   const type &tp;
 
 public:
-  function(const std::string &n, const std::map<std::string, variable *> &vars, const type &tp);
+  function(const std::string &n, const std::vector<variable *> &vars, const type &tp);
   ~function();
 
   std::string get_name() const { return name; }
-  std::map<std::string, variable *> get_variables() const { return variables; }
-  variable &get_variable(const std::string &n) const { return *variables.at(n); }
+  std::vector<variable *> get_variables() const { return variables; }
   const type &get_type() const { return tp; }
 };
 

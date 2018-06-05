@@ -78,11 +78,11 @@ ast::requirement *parser::req_def()
     }
 }
 
-std::map<std::string, ast::variable *> parser::typed_list_variable(const std::map<std::string, ast::type *> &tps)
+std::vector<ast::variable *> parser::typed_list_variable(const std::map<std::string, ast::type *> &tps)
 {
     ast::type &o_tp = *tps.at("object");
     std::vector<std::string> c_vars;
-    std::map<std::string, ast::variable *> vars;
+    std::vector<ast::variable *> vars;
     while (!match(RPAREN_ID))
     {
         if (!match(ID_ID))
@@ -93,7 +93,7 @@ std::map<std::string, ast::variable *> parser::typed_list_variable(const std::ma
             if (match(OBJECT_ID))
             {
                 for (const std::string &var : c_vars)
-                    vars.insert({var, new ast::variable(var, o_tp)});
+                    vars.push_back(new ast::variable(var, o_tp));
                 c_vars.clear();
             }
             else
@@ -102,13 +102,13 @@ std::map<std::string, ast::variable *> parser::typed_list_variable(const std::ma
                     error("expected identifier..");
                 std::string ctn = static_cast<id_token *>(tks[pos - 2])->id;
                 for (const std::string &var : c_vars)
-                    vars.insert({var, new ast::variable(var, *tps.at(ctn))});
+                    vars.push_back(new ast::variable(var, *tps.at(ctn)));
                 c_vars.clear();
             }
     }
     backtrack(pos - 1);
     for (const std::string &var : c_vars)
-        vars.insert({var, new ast::variable(var, o_tp)});
+        vars.push_back(new ast::variable(var, o_tp));
     return vars;
 }
 
@@ -279,7 +279,7 @@ ast::domain *domain_parser::parse()
                 if (!match(ID_ID))
                     error("expected identifier..");
                 std::string pn = static_cast<id_token *>(tks[pos - 2])->id;
-                std::map<std::string, ast::variable *> vars = typed_list_variable(tps);
+                std::vector<ast::variable *> vars = typed_list_variable(tps);
                 if (!match(RPAREN_ID))
                     error("expected ')'..");
                 ast::predicate *p = new ast::predicate(pn, vars);
@@ -294,7 +294,7 @@ ast::domain *domain_parser::parse()
         {
             ast::type &o_tp = *tps["object"];
             std::vector<std::string> c_fnms;
-            std::vector<std::map<std::string, ast::variable *>> c_vars;
+            std::vector<std::vector<ast::variable *>> c_vars;
             do
             {
                 if (!match(LPAREN_ID))

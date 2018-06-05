@@ -30,18 +30,18 @@ object::~object() {}
 variable::variable(const std::string &n, const type &tp) : name(n), tp(tp) {}
 variable::~variable() {}
 
-predicate::predicate(const std::string &n, const std::map<std::string, variable *> &vars) : name(n), variables(vars) {}
+predicate::predicate(const std::string &n, const std::vector<variable *> &vars) : name(n), variables(vars) {}
 predicate::~predicate()
 {
     for (auto &&v : variables)
-        delete v.second;
+        delete v;
 }
 
-function::function(const std::string &n, const std::map<std::string, variable *> &vars, const type &tp) : name(n), variables(vars), tp(tp) {}
+function::function(const std::string &n, const std::vector<variable *> &vars, const type &tp) : name(n), variables(vars), tp(tp) {}
 function::~function()
 {
     for (auto &&v : variables)
-        delete v.second;
+        delete v;
 }
 
 always_term::always_term(const term &trm) : trm(trm) {}

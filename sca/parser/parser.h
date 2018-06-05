@@ -28,7 +28,7 @@ protected:
   void backtrack(const size_t &p);
 
   ast::requirement *req_def();
-  std::map<std::string, ast::variable *> typed_list_variable(const std::map<std::string, ast::type *> &tps);
+  std::vector<ast::variable *> typed_list_variable(const std::map<std::string, ast::type *> &tps);
 
   void error(const std::string &err);
 };
