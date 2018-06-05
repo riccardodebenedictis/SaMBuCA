@@ -29,9 +29,17 @@ void test2() // testing domain requirements..
     ast::domain *dom = dp.parse();
 }
 
+void test3() // testing predicates..
+{
+    std::stringstream dss("(define (domain test-0) (:requirements :typing) (:types block) (:predicates (on ?x ?y - block)))");
+    domain_parser dp(dss);
+    ast::domain *dom = dp.parse();
+}
+
 int main(int argc, char *argv[])
 {
     test0();
     test1();
     test2();
+    test3();
 }

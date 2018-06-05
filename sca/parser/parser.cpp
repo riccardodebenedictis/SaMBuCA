@@ -184,6 +184,7 @@ ast::domain *domain_parser::parse()
         else
             backtrack(c_pos);
 
+    c_pos = pos;
     if (match(LPAREN_ID))
         if (match(TYPES_ID)) // the domain types..
         {
@@ -230,6 +231,7 @@ ast::domain *domain_parser::parse()
         else
             backtrack(c_pos);
 
+    c_pos = pos;
     if (match(LPAREN_ID))
         if (match(CONSTANTS_ID)) // the domain constants..
         {
@@ -264,14 +266,20 @@ ast::domain *domain_parser::parse()
         else
             backtrack(c_pos);
 
+    c_pos = pos;
     if (match(LPAREN_ID))
         if (match(PREDICATES_ID)) // the domain predicates..
             do
             {
+                if (!match(LPAREN_ID))
+                    error("expected '('..");
                 if (!match(ID_ID))
                     error("expected identifier..");
                 std::string pn = static_cast<id_token *>(tks[pos - 2])->id;
-                ast::predicate *p = new ast::predicate(pn, typed_list_variable(tps));
+                std::map<std::string, ast::variable *> vars = typed_list_variable(tps);
+                if (!match(RPAREN_ID))
+                    error("expected ')'..");
+                ast::predicate *p = new ast::predicate(pn, vars);
                 preds.insert({pn, p});
             } while (!match(RPAREN_ID));
         else
