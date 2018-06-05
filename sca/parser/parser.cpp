@@ -153,6 +153,7 @@ ast::domain *domain_parser::parse()
     std::vector<ast::requirement *> reqs;
     std::map<std::string, ast::type *> tps;
     std::map<std::string, ast::constant *> cnsts;
+    std::map<std::string, ast::predicate *> preds;
 
     if (!match(LPAREN_ID))
         error("expected '('..");
@@ -263,10 +264,23 @@ ast::domain *domain_parser::parse()
         else
             backtrack(c_pos);
 
+    if (match(LPAREN_ID))
+        if (match(PREDICATES_ID)) // the domain predicates..
+            do
+            {
+                if (!match(ID_ID))
+                    error("expected identifier..");
+                std::string pn = static_cast<id_token *>(tks[pos - 2])->id;
+                ast::predicate *p = new ast::predicate(pn, typed_list_variable(tps));
+                preds.insert({pn, p});
+            } while (!match(RPAREN_ID));
+        else
+            backtrack(c_pos);
+
     if (!match(RPAREN_ID))
         error("expected ')'..");
 
-    return new ast::domain(n, reqs, tps, cnsts);
+    return new ast::domain(n, reqs, tps, cnsts, preds);
 }
 
 problem_parser::problem_parser(std::istream &is, ast::domain &dom) : parser(is), dom(dom) {}
