@@ -148,19 +148,21 @@ public:
   function_term(const function &fn, const std::vector<term *> &terms);
   ~function_term();
 
+  const function &get_function() const { return fn; }
   std::vector<term *> get_terms() const { return terms; }
 };
 
 class predicate_term : public term
 {
 private:
-  const predicate fn;
+  const predicate pred;
   const std::vector<term *> terms;
 
 public:
-  predicate_term(const predicate &fn, const std::vector<term *> &terms);
+  predicate_term(const predicate &pred, const std::vector<term *> &terms);
   ~predicate_term();
 
+  const predicate &get_predicate() const { return pred; }
   std::vector<term *> get_terms() const { return terms; }
 };
 
@@ -245,7 +247,7 @@ private:
   const term trm;
 
 public:
-  assign_op_term(const assign_op op, const function_term &fnctn_trm, const term &trm);
+  assign_op_term(const assign_op &op, const function_term &fnctn_trm, const term &trm);
   ~assign_op_term();
 
   const assign_op &get_op() const { return op; }
