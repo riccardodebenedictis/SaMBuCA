@@ -1,6 +1,8 @@
 package it.cnr.istc.nn;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 
 import it.cnr.istc.nn.activation.ActivationFunction;
@@ -14,6 +16,7 @@ public class Network {
     private final Random rnd; // the random number generator..
     private final ErrorFunction ef; // the error function..
     private final Layer[] layers; // the layers..
+    private final Collection<NetworkListener> listeners = new ArrayList<>();
 
     public Network(final ErrorFunction ef, final ActivationFunction af, final int... sizes) {
         this.rnd = new Random();
@@ -71,13 +74,21 @@ public class Network {
      */
     public void sgd(final DataRow[] tr_data, final DataRow[] eval_data, final int epochs, final int mini_batch_size,
             final double eta, final double mu, double lambda) {
+        // we notify the listeners that we are starting a training phase..
+        listeners.forEach(l -> l.start_training(epochs, getError(tr_data), getError(eval_data)));
         for (int i = 1; i <= epochs; ++i) {
+            // we notify the listeners that we are starting a new epoch..
+            listeners.forEach(l -> l.start_epoch(getError(tr_data), getError(eval_data)));
             // we shuffle the training data..
             shuffle(rnd, tr_data);
             // we partition the training data into mini batches of 'mini_batch_size' size..
             for (int j = 0; j <= tr_data.length - mini_batch_size; j += mini_batch_size)
                 update_mini_batch(Arrays.copyOfRange(tr_data, j, j + mini_batch_size), eta, mu, lambda);
+            // we notify the listeners that we have finished an epoch..
+            listeners.forEach(l -> l.stop_epoch(getError(tr_data), getError(eval_data)));
         }
+        // we notify the listeners that we have finished a training phase..
+        listeners.forEach(l -> l.stop_training(getError(tr_data), getError(eval_data)));
     }
 
     private void update_mini_batch(final DataRow[] mini_batch, final double eta, final double mu, final double lambda) {
@@ -131,6 +142,14 @@ public class Network {
             for (int k = 0; k < data.x.length; ++k)
                 layers[0].nabla_w[i][k] += data.x[k] * layers[0].delta[i];
         }
+    }
+
+    public void addListener(NetworkListener l) {
+        listeners.add(l);
+    }
+
+    public void removeListener(NetworkListener l) {
+        listeners.remove(l);
     }
 
     // Fisher–Yates shuffle..
