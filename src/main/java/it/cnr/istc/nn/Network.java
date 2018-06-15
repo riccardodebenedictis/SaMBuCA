@@ -19,9 +19,9 @@ public class Network {
     private final Collection<NetworkListener> listeners = new ArrayList<>();
 
     public Network(final ErrorFunction ef, final ActivationFunction af, final int... sizes) {
-        this.rnd = new Random();
+        this.rnd = new Random(0);
         this.ef = ef;
-        this.layers = new Layer[sizes.length];
+        this.layers = new Layer[sizes.length - 1];
 
         // we initialize the layers..
         for (int i = 0; i < sizes.length - 1; ++i)
