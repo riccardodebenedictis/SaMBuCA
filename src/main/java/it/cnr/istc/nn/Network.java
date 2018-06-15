@@ -77,18 +77,14 @@ public class Network {
         // we notify the listeners that we are starting a training phase..
         listeners.forEach(l -> l.start_training(epochs, getError(tr_data), getError(eval_data)));
         for (int i = 1; i <= epochs; ++i) {
-            // we notify the listeners that we are starting a new epoch..
-            listeners.forEach(l -> l.start_epoch(getError(tr_data), getError(eval_data)));
             // we shuffle the training data..
             shuffle(rnd, tr_data);
             // we partition the training data into mini batches of 'mini_batch_size' size..
             for (int j = 0; j <= tr_data.length - mini_batch_size; j += mini_batch_size)
                 update_mini_batch(Arrays.copyOfRange(tr_data, j, j + mini_batch_size), eta, mu, lambda);
             // we notify the listeners that we have finished an epoch..
-            listeners.forEach(l -> l.stop_epoch(getError(tr_data), getError(eval_data)));
+            listeners.forEach(l -> l.epoch(getError(tr_data), getError(eval_data)));
         }
-        // we notify the listeners that we have finished a training phase..
-        listeners.forEach(l -> l.stop_training(getError(tr_data), getError(eval_data)));
     }
 
     private void update_mini_batch(final DataRow[] mini_batch, final double eta, final double mu, final double lambda) {

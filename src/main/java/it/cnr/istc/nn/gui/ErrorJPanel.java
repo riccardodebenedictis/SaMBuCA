@@ -45,19 +45,7 @@ public class ErrorJPanel extends JPanel implements NetworkListener {
     }
 
     @Override
-    public void stop_training(double tr_error, double evl_error) {
-        tr_data_error.addOrUpdate(new Millisecond(), tr_error);
-        tst_data_error.addOrUpdate(new Millisecond(), evl_error);
-    }
-
-    @Override
-    public void start_epoch(double tr_error, double evl_error) {
-        tr_data_error.addOrUpdate(new Millisecond(), tr_error);
-        tst_data_error.addOrUpdate(new Millisecond(), evl_error);
-    }
-
-    @Override
-    public void stop_epoch(double tr_error, double evl_error) {
+    public void epoch(double tr_error, double evl_error) {
         tr_data_error.addOrUpdate(new Millisecond(), tr_error);
         tst_data_error.addOrUpdate(new Millisecond(), evl_error);
     }

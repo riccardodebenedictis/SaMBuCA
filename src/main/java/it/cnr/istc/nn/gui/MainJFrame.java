@@ -50,18 +50,8 @@ public class MainJFrame extends JFrame implements NetworkListener {
     }
 
     @Override
-    public void stop_training(double tr_error, double evl_error) {
-        error_panel.stop_training(tr_error, evl_error);
-    }
-
-    @Override
-    public void start_epoch(double tr_error, double evl_error) {
-        error_panel.start_epoch(tr_error, evl_error);
-    }
-
-    @Override
-    public void stop_epoch(double tr_error, double evl_error) {
-        error_panel.stop_epoch(tr_error, evl_error);
+    public void epoch(double tr_error, double evl_error) {
+        error_panel.epoch(tr_error, evl_error);
         bar.setValue(bar.getValue() + 1);
     }
 }
