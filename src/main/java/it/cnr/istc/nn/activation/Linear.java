@@ -6,12 +6,12 @@ package it.cnr.istc.nn.activation;
 public class Linear implements ActivationFunction {
 
     @Override
-    public double compute(double v) {
+    public double compute(final double v) {
         return v;
     }
 
     @Override
-    public double derivative(double v) {
+    public double derivative(final double v) {
         return 1;
     }
 }

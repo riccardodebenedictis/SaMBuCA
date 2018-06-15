@@ -6,7 +6,7 @@ package it.cnr.istc.nn.activation;
 public class Sigmoid implements ActivationFunction {
 
     @Override
-    public double compute(double v) {
+    public double compute(final double v) {
         if (v > 100)
             return 1.0;
         else if (v < -100)
@@ -16,7 +16,7 @@ public class Sigmoid implements ActivationFunction {
     }
 
     @Override
-    public double derivative(double v) {
+    public double derivative(final double v) {
         return compute(v) * (1.0 - compute(v));
     }
 }

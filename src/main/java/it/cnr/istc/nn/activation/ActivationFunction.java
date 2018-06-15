@@ -5,7 +5,7 @@ package it.cnr.istc.nn.activation;
  */
 public interface ActivationFunction {
 
-    public double compute(double v);
+    public double compute(final double v);
 
-    public double derivative(double v);
+    public double derivative(final double v);
 }

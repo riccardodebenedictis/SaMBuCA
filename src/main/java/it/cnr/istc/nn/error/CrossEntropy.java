@@ -8,7 +8,7 @@ import it.cnr.istc.nn.activation.ActivationFunction;
 public class CrossEntropy implements ErrorFunction {
 
     @Override
-    public double error(double[] a, double[] y) {
+    public double error(final double[] a, final double[] y) {
         assert a.length == y.length;
         double err = 0;
         for (int i = 0; i < a.length; ++i)
@@ -17,7 +17,7 @@ public class CrossEntropy implements ErrorFunction {
     }
 
     @Override
-    public double[] delta(ActivationFunction af, double[] z, double[] a, double[] y) {
+    public double[] delta(final ActivationFunction af, final double[] z, final double[] a, final double[] y) {
         assert z.length == a.length;
         assert a.length == y.length;
         double[] d = new double[a.length];

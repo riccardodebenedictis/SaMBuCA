@@ -7,7 +7,7 @@ import it.cnr.istc.nn.activation.ActivationFunction;
  */
 public interface ErrorFunction {
 
-    public double error(double[] a, double[] y);
+    public double error(final double[] a, final double[] y);
 
-    public double[] delta(ActivationFunction af, double[] z, double[] a, double[] y);
+    public double[] delta(final ActivationFunction af, final double[] z, final double[] a, final double[] y);
 }
