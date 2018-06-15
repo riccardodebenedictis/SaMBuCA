@@ -1,4 +1,4 @@
-package it.cnr.istc.nn.gui;
+package it.cnr.istc.neon.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -13,7 +13,7 @@ import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
-import it.cnr.istc.nn.NetworkListener;
+import it.cnr.istc.neon.NetworkListener;
 
 /**
  * ErrorJPanel

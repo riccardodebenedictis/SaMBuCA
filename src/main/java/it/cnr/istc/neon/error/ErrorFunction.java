@@ -1,6 +1,6 @@
-package it.cnr.istc.nn.error;
+package it.cnr.istc.neon.error;
 
-import it.cnr.istc.nn.activation.ActivationFunction;
+import it.cnr.istc.neon.activation.ActivationFunction;
 
 /**
  * ErrorFunction

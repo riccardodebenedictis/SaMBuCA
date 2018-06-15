@@ -1,4 +1,4 @@
-package it.cnr.istc.nn;
+package it.cnr.istc.neon;
 
 /**
  * DataRow

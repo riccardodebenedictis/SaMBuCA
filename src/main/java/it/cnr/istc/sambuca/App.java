@@ -1,10 +1,10 @@
 package it.cnr.istc.sambuca;
 
-import it.cnr.istc.nn.DataRow;
-import it.cnr.istc.nn.Network;
-import it.cnr.istc.nn.activation.Sigmoid;
-import it.cnr.istc.nn.error.CrossEntropy;
-import it.cnr.istc.nn.gui.MainJFrame;
+import it.cnr.istc.neon.DataRow;
+import it.cnr.istc.neon.Network;
+import it.cnr.istc.neon.activation.Sigmoid;
+import it.cnr.istc.neon.error.CrossEntropy;
+import it.cnr.istc.neon.gui.MainJFrame;
 
 /**
  * Creates a simple newural network, tests it with some training and evaluation

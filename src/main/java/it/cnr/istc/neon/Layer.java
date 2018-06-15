@@ -1,8 +1,8 @@
-package it.cnr.istc.nn;
+package it.cnr.istc.neon;
 
 import java.util.Random;
 
-import it.cnr.istc.nn.activation.ActivationFunction;
+import it.cnr.istc.neon.activation.ActivationFunction;
 
 /**
  * Layer

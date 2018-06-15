@@ -1,4 +1,4 @@
-package it.cnr.istc.nn.gui;
+package it.cnr.istc.neon.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -6,8 +6,8 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
-import it.cnr.istc.nn.Network;
-import it.cnr.istc.nn.NetworkListener;
+import it.cnr.istc.neon.Network;
+import it.cnr.istc.neon.NetworkListener;
 
 /**
  * MainJFrame

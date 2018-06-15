@@ -1,12 +1,12 @@
-package it.cnr.istc.nn;
+package it.cnr.istc.neon;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
-import it.cnr.istc.nn.activation.ActivationFunction;
-import it.cnr.istc.nn.error.ErrorFunction;
+import it.cnr.istc.neon.activation.ActivationFunction;
+import it.cnr.istc.neon.error.ErrorFunction;
 
 /**
  * This class is intended to represent Artificial Neural Network instances.

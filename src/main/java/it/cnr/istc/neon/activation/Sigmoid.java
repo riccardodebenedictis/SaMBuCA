@@ -1,4 +1,4 @@
-package it.cnr.istc.nn.activation;
+package it.cnr.istc.neon.activation;
 
 /**
  * Sigmoid activation function.
