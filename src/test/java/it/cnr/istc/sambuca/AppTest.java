@@ -1,4 +1,4 @@
-package it.cnr.istc;
+package it.cnr.istc.sambuca;
 
 import org.junit.jupiter.api.Test;
 

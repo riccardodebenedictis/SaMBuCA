@@ -1,4 +1,4 @@
-package it.cnr.istc;
+package it.cnr.istc.sambuca;
 
 /**
  * Hello world!

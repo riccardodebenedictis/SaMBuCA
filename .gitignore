@@ -1,5 +1,6 @@
 /.settings
 /.vscode
+/src/main/antlr4/it/cnr/istc/sambuca/.antlr
 /target
 .classpath
 .project
