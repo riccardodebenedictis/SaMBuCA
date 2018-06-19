@@ -51,10 +51,10 @@ public class PredicateTerm implements Term {
     @Override
     public String toString() {
         if (directed) {
-            return "(" + predicate.getName() + " "
+            return "(" + predicate.getName() + (arguments.isEmpty() ? "" : " ")
                     + arguments.stream().map(argument -> argument.toString()).collect(Collectors.joining(" ")) + ")";
         } else {
-            return "(not (" + predicate.getName() + " "
+            return "(not (" + predicate.getName() + (arguments.isEmpty() ? "" : " ")
                     + arguments.stream().map(argument -> argument.toString()).collect(Collectors.joining(" ")) + "))";
         }
     }
