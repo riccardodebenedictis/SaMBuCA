@@ -58,7 +58,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitPref_GD_preference_gD(PDDLParser.Pref_GD_preference_gDContext ctx) {
-        String text = (ctx.pref_name() != null ? ctx.pref_name().name().NAME().getText() : null);
+        String text = (ctx.pref_name() != null ? ctx.pref_name().name().NAME().getText().toLowerCase() : null);
         return new PreferenceTerm(text, visit(ctx.gD()));
     }
 
@@ -118,7 +118,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_comp(PDDLParser.F_compContext ctx) {
-        switch (ctx.binary_comp().getText()) {
+        switch (ctx.binary_comp().getText().toLowerCase()) {
         case ">":
             return new ComparisonTerm(ComparisonTerm.Comp.Gt, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
         case "<":
@@ -130,7 +130,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         case "<=":
             return new ComparisonTerm(ComparisonTerm.Comp.LEq, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
         default:
-            throw new AssertionError(ctx.binary_comp().getText());
+            throw new AssertionError(ctx.binary_comp().getText().toLowerCase());
         }
     }
 
@@ -156,12 +156,12 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitAtomic_formula_term_predicate(PDDLParser.Atomic_formula_term_predicateContext ctx) {
-        Predicate predicate = domain.getPredicate(ctx.predicate().name().getText());
+        Predicate predicate = domain.getPredicate(ctx.predicate().name().getText().toLowerCase());
         for (int i = 0; i < ctx.term().size(); i++) {
             if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables
-                    .containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                    .containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText().toLowerCase())) {
                 Variable variable = new Variable(
-                        "?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(),
+                        "?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText().toLowerCase(),
                         predicate.getVariables().get(i).getType());
                 variables.put(variable.getName(), variable);
             }
@@ -176,11 +176,11 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitAtomic_formula_name_predicate(PDDLParser.Atomic_formula_name_predicateContext ctx) {
-        return new PredicateTerm(true, domain.getPredicate(ctx.predicate().name().getText()),
+        return new PredicateTerm(true, domain.getPredicate(ctx.predicate().name().getText().toLowerCase()),
                 ctx.name().stream()
                         .map(name -> new ConstantTerm(
-                                domain.getConstants().containsKey(name.getText()) ? domain.getConstant(name.getText())
-                                        : problem.getObject(name.getText())))
+                                domain.getConstants().containsKey(name.getText().toLowerCase()) ? domain.getConstant(name.getText().toLowerCase())
+                                        : problem.getObject(name.getText().toLowerCase())))
                         .toArray(Term[]::new));
     }
 
@@ -192,13 +192,13 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
     @Override
     public Term visitTerm_name(PDDLParser.Term_nameContext ctx) {
         return new ConstantTerm(
-                domain.getConstants().containsKey(ctx.name().getText()) ? domain.getConstant(ctx.name().getText())
-                        : problem.getObject(ctx.name().getText()));
+                domain.getConstants().containsKey(ctx.name().getText().toLowerCase()) ? domain.getConstant(ctx.name().getText().toLowerCase())
+                        : problem.getObject(ctx.name().getText().toLowerCase()));
     }
 
     @Override
     public Term visitTerm_variable(PDDLParser.Term_variableContext ctx) {
-        return new VariableTerm(variables.get("?" + ctx.variable().name().getText()));
+        return new VariableTerm(variables.get("?" + ctx.variable().name().getText().toLowerCase()));
     }
 
     @Override
@@ -208,12 +208,12 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitFunction_term(PDDLParser.Function_termContext ctx) {
-        Function function = domain.getFunction(ctx.function_symbol().name().getText());
+        Function function = domain.getFunction(ctx.function_symbol().name().getText().toLowerCase());
         for (int i = 0; i < ctx.term().size(); i++) {
             if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables
-                    .containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                    .containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText().toLowerCase())) {
                 Variable variable = new Variable(
-                        "?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(),
+                        "?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText().toLowerCase(),
                         function.getVariables().get(i).getType());
                 variables.put(variable.getName(), variable);
             }
@@ -223,12 +223,12 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_exp_number(PDDLParser.F_exp_numberContext ctx) {
-        return new NumberTerm(new BigDecimal(ctx.NUMBER().getText()));
+        return new NumberTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase()));
     }
 
     @Override
     public Term visitF_exp_binary_op(PDDLParser.F_exp_binary_opContext ctx) {
-        switch (ctx.binary_op().getText()) {
+        switch (ctx.binary_op().getText().toLowerCase()) {
         case "-":
             return new OpTerm(OpTerm.Op.Sub, visit(ctx.f_exp(0)), visit(ctx.f_exp(1)));
         case "/":
@@ -238,19 +238,19 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
         case "*":
             return new OpTerm(OpTerm.Op.Mul, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
         default:
-            throw new AssertionError(ctx.binary_op().getText());
+            throw new AssertionError(ctx.binary_op().getText().toLowerCase());
         }
     }
 
     @Override
     public Term visitF_exp_multi_op(PDDLParser.F_exp_multi_opContext ctx) {
-        switch (ctx.multi_op().getText()) {
+        switch (ctx.multi_op().getText().toLowerCase()) {
         case "+":
             return new OpTerm(OpTerm.Op.Add, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
         case "*":
             return new OpTerm(OpTerm.Op.Mul, ctx.f_exp().stream().map(f_exp -> visit(f_exp)).toArray(Term[]::new));
         default:
-            throw new AssertionError(ctx.multi_op().getText());
+            throw new AssertionError(ctx.multi_op().getText().toLowerCase());
         }
     }
 
@@ -266,12 +266,12 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_head_function_symbol_terms(PDDLParser.F_head_function_symbol_termsContext ctx) {
-        Function function = domain.getFunction(ctx.function_symbol().name().getText());
+        Function function = domain.getFunction(ctx.function_symbol().name().getText().toLowerCase());
         for (int i = 0; i < ctx.term().size(); i++) {
             if (ctx.term(i) instanceof PDDLParser.Term_variableContext && !variables
-                    .containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText())) {
+                    .containsKey("?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText().toLowerCase())) {
                 Variable variable = new Variable(
-                        "?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText(),
+                        "?" + ((PDDLParser.Term_variableContext) ctx.term(i)).variable().name().getText().toLowerCase(),
                         function.getVariables().get(i).getType());
                 variables.put(variable.getName(), variable);
             }
@@ -281,7 +281,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitF_head_function_symbol(PDDLParser.F_head_function_symbolContext ctx) {
-        return new FunctionTerm(domain.getFunction(ctx.function_symbol().name().getText()));
+        return new FunctionTerm(domain.getFunction(ctx.function_symbol().name().getText().toLowerCase()));
     }
 
     @Override
@@ -324,7 +324,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitP_effect_assign_op_f_head_f_exp(PDDLParser.P_effect_assign_op_f_head_f_expContext ctx) {
-        switch (ctx.assign_op().getText()) {
+        switch (ctx.assign_op().getText().toLowerCase()) {
         case "assign":
             return new AssignOpTerm(AssignOpTerm.AssignOp.Assign, (FunctionTerm) visit(ctx.f_head()),
                     visit(ctx.f_exp()));
@@ -341,7 +341,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
             return new AssignOpTerm(AssignOpTerm.AssignOp.Decrease, (FunctionTerm) visit(ctx.f_head()),
                     visit(ctx.f_exp()));
         default:
-            throw new AssertionError(ctx.assign_op().getText());
+            throw new AssertionError(ctx.assign_op().getText().toLowerCase());
         }
     }
 
@@ -390,19 +390,19 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitPref_timed_GD_preference_timed_GD(PDDLParser.Pref_timed_GD_preference_timed_GDContext ctx) {
-        String text = (ctx.pref_name() != null ? ctx.pref_name().name().NAME().getText() : null);
+        String text = (ctx.pref_name() != null ? ctx.pref_name().name().NAME().getText().toLowerCase() : null);
         return new PreferenceTerm(text, visit(ctx.timed_GD()));
     }
 
     @Override
     public Term visitTimed_GD_at_GD(PDDLParser.Timed_GD_at_GDContext ctx) {
-        switch (ctx.time_specifier().getText()) {
+        switch (ctx.time_specifier().getText().toLowerCase()) {
         case "start":
             return new AtStartTerm(visit(ctx.gD()));
         case "end":
             return new AtEndTerm(visit(ctx.gD()));
         default:
-            throw new AssertionError(ctx.time_specifier().getText());
+            throw new AssertionError(ctx.time_specifier().getText().toLowerCase());
         }
     }
 
@@ -430,7 +430,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitSimple_duration_constraint_d_op(PDDLParser.Simple_duration_constraint_d_opContext ctx) {
-        switch (ctx.d_op().getText()) {
+        switch (ctx.d_op().getText().toLowerCase()) {
         case "=":
             return new ComparisonTerm(ComparisonTerm.Comp.Eq, new VariableTerm(variables.get("?duration")),
                     visit(ctx.d_value()));
@@ -441,7 +441,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
             return new ComparisonTerm(ComparisonTerm.Comp.LEq, new VariableTerm(variables.get("?duration")),
                     visit(ctx.d_value()));
         default:
-            throw new AssertionError(ctx.d_op().getText());
+            throw new AssertionError(ctx.d_op().getText().toLowerCase());
         }
     }
 
@@ -452,7 +452,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitD_value_number(PDDLParser.D_value_numberContext ctx) {
-        return new NumberTerm(new BigDecimal(ctx.NUMBER().getText()));
+        return new NumberTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase()));
     }
 
     @Override
@@ -484,31 +484,31 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitTimed_effect_cond_effect(PDDLParser.Timed_effect_cond_effectContext ctx) {
-        switch (ctx.time_specifier().getText()) {
+        switch (ctx.time_specifier().getText().toLowerCase()) {
         case "start":
             return new AtStartTerm(visit(ctx.cond_effect()));
         case "end":
             return new AtEndTerm(visit(ctx.cond_effect()));
         default:
-            throw new AssertionError(ctx.time_specifier().getText());
+            throw new AssertionError(ctx.time_specifier().getText().toLowerCase());
         }
     }
 
     @Override
     public Term visitTimed_effect_f_assign_da(PDDLParser.Timed_effect_f_assign_daContext ctx) {
-        switch (ctx.time_specifier().getText()) {
+        switch (ctx.time_specifier().getText().toLowerCase()) {
         case "start":
             return new AtStartTerm(visit(ctx.f_assign_da()));
         case "end":
             return new AtEndTerm(visit(ctx.f_assign_da()));
         default:
-            throw new AssertionError(ctx.time_specifier().getText());
+            throw new AssertionError(ctx.time_specifier().getText().toLowerCase());
         }
     }
 
     @Override
     public Term visitTimed_effect_assign_op(PDDLParser.Timed_effect_assign_opContext ctx) {
-        switch (ctx.assign_op_t().getText()) {
+        switch (ctx.assign_op_t().getText().toLowerCase()) {
         case "increase":
             return new AssignOpTerm(AssignOpTerm.AssignOp.Increase, (FunctionTerm) visit(ctx.f_head()),
                     visit(ctx.f_exp_t()));
@@ -516,13 +516,13 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
             return new AssignOpTerm(AssignOpTerm.AssignOp.Decrease, (FunctionTerm) visit(ctx.f_head()),
                     visit(ctx.f_exp_t()));
         default:
-            throw new AssertionError(ctx.assign_op_t().getText());
+            throw new AssertionError(ctx.assign_op_t().getText().toLowerCase());
         }
     }
 
     @Override
     public Term visitF_assign_da(PDDLParser.F_assign_daContext ctx) {
-        switch (ctx.assign_op().getText()) {
+        switch (ctx.assign_op().getText().toLowerCase()) {
         case "assign":
             return new AssignOpTerm(AssignOpTerm.AssignOp.Assign, (FunctionTerm) visit(ctx.f_head()),
                     visit(ctx.f_exp_da()));
@@ -539,13 +539,13 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
             return new AssignOpTerm(AssignOpTerm.AssignOp.Decrease, (FunctionTerm) visit(ctx.f_head()),
                     visit(ctx.f_exp_da()));
         default:
-            throw new AssertionError(ctx.assign_op().getText());
+            throw new AssertionError(ctx.assign_op().getText().toLowerCase());
         }
     }
 
     @Override
     public Term visitF_exp_da_binary(PDDLParser.F_exp_da_binaryContext ctx) {
-        switch (ctx.binary_op().getText()) {
+        switch (ctx.binary_op().getText().toLowerCase()) {
         case "-":
             return new OpTerm(OpTerm.Op.Sub, visit(ctx.f_exp_da(0)), visit(ctx.f_exp_da(1)));
         case "/":
@@ -557,13 +557,13 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
             return new OpTerm(OpTerm.Op.Mul,
                     ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
         default:
-            throw new AssertionError(ctx.binary_op().getText());
+            throw new AssertionError(ctx.binary_op().getText().toLowerCase());
         }
     }
 
     @Override
     public Term visitF_exp_da_multi(PDDLParser.F_exp_da_multiContext ctx) {
-        switch (ctx.multi_op().getText()) {
+        switch (ctx.multi_op().getText().toLowerCase()) {
         case "+":
             return new OpTerm(OpTerm.Op.Add,
                     ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
@@ -571,7 +571,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
             return new OpTerm(OpTerm.Op.Mul,
                     ctx.f_exp_da().stream().map(f_exp_da -> visit(f_exp_da)).toArray(Term[]::new));
         default:
-            throw new AssertionError(ctx.multi_op().getText());
+            throw new AssertionError(ctx.multi_op().getText().toLowerCase());
         }
     }
 
@@ -607,36 +607,36 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitInit_el_at(PDDLParser.Init_el_atContext ctx) {
-        return new AtTerm(new BigDecimal(ctx.NUMBER().getText()), (PredicateTerm) visit(ctx.literal_name()));
+        return new AtTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase()), (PredicateTerm) visit(ctx.literal_name()));
     }
 
     @Override
     public Term visitInit_el_eq_number(PDDLParser.Init_el_eq_numberContext ctx) {
         return new EqTerm(true, visit(ctx.basic_function_term()),
-                new NumberTerm(new BigDecimal(ctx.NUMBER().getText())));
+                new NumberTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase())));
     }
 
     @Override
     public Term visitInit_el_eq_name(PDDLParser.Init_el_eq_nameContext ctx) {
         return new EqTerm(true, visit(ctx.basic_function_term()),
-                new ConstantTerm(domain.getConstants().containsKey(ctx.name().getText())
-                        ? domain.getConstant(ctx.name().getText())
-                        : problem.getObject(ctx.name().getText())));
+                new ConstantTerm(domain.getConstants().containsKey(ctx.name().getText().toLowerCase())
+                        ? domain.getConstant(ctx.name().getText().toLowerCase())
+                        : problem.getObject(ctx.name().getText().toLowerCase())));
     }
 
     @Override
     public Term visitBasic_function_term_function_symbol(PDDLParser.Basic_function_term_function_symbolContext ctx) {
-        return new FunctionTerm(domain.getFunction(ctx.function_symbol().name().getText()));
+        return new FunctionTerm(domain.getFunction(ctx.function_symbol().name().getText().toLowerCase()));
     }
 
     @Override
     public Term visitBasic_function_term_function_symbol_names(
             PDDLParser.Basic_function_term_function_symbol_namesContext ctx) {
-        return new FunctionTerm(domain.getFunction(ctx.function_symbol().name().getText()),
+        return new FunctionTerm(domain.getFunction(ctx.function_symbol().name().getText().toLowerCase()),
                 ctx.name().stream()
                         .map(name -> new ConstantTerm(
-                                domain.getConstants().containsKey(name.getText()) ? domain.getConstant(name.getText())
-                                        : problem.getObject(name.getText())))
+                                domain.getConstants().containsKey(name.getText().toLowerCase()) ? domain.getConstant(name.getText().toLowerCase())
+                                        : problem.getObject(name.getText().toLowerCase())))
                         .toArray(Term[]::new));
     }
 
@@ -654,7 +654,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitPref_con_GD_preference(PDDLParser.Pref_con_GD_preferenceContext ctx) {
-        String text = (ctx.pref_name() != null ? ctx.pref_name().name().NAME().getText() : null);
+        String text = (ctx.pref_name() != null ? ctx.pref_name().name().NAME().getText().toLowerCase() : null);
         return new PreferenceTerm(text, visit(ctx.con_GD()));
     }
 
@@ -692,7 +692,7 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitCon_GD_within(PDDLParser.Con_GD_withinContext ctx) {
-        return new WithinTerm(new BigDecimal(ctx.NUMBER().getText()), visit(ctx.gD()));
+        return new WithinTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase()), visit(ctx.gD()));
     }
 
     @Override
@@ -712,17 +712,17 @@ class TermVisitor extends PDDLBaseVisitor<Term> {
 
     @Override
     public Term visitCon_GD_always_within(PDDLParser.Con_GD_always_withinContext ctx) {
-        return new AlwaysWithinTerm(new BigDecimal(ctx.NUMBER().getText()), visit(ctx.gD(0)), visit(ctx.gD(1)));
+        return new AlwaysWithinTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase()), visit(ctx.gD(0)), visit(ctx.gD(1)));
     }
 
     @Override
     public Term visitCon_GD_hold_during(PDDLParser.Con_GD_hold_duringContext ctx) {
-        return new HoldDuringTerm(new BigDecimal(ctx.NUMBER(0).getText()), new BigDecimal(ctx.NUMBER(1).getText()),
+        return new HoldDuringTerm(new BigDecimal(ctx.NUMBER(0).getText().toLowerCase()), new BigDecimal(ctx.NUMBER(1).getText().toLowerCase()),
                 visit(ctx.gD()));
     }
 
     @Override
     public Term visitCon_GD_hold_after(PDDLParser.Con_GD_hold_afterContext ctx) {
-        return new HoldAfterTerm(new BigDecimal(ctx.NUMBER().getText()), visit(ctx.gD()));
+        return new HoldAfterTerm(new BigDecimal(ctx.NUMBER().getText().toLowerCase()), visit(ctx.gD()));
     }
 }

@@ -20,21 +20,21 @@ class TypedListVariableListener extends PDDLBaseListener {
             type = Type.OBJECT;
         } else if (ctx.type().primitive_type().size() == 1) {
             type = ctx.type().primitive_type(0).name() == null ? Type.OBJECT
-                    : domain.getType(ctx.type().primitive_type(0).name().getText());
+                    : domain.getType(ctx.type().primitive_type(0).name().getText().toLowerCase());
         } else {
             type = new EitherType(ctx.type().primitive_type().stream()
                     .map(primitive_type -> primitive_type.name() == null ? Type.OBJECT
-                            : domain.getType(primitive_type.name().getText()))
+                            : domain.getType(primitive_type.name().getText().toLowerCase()))
                     .collect(Collectors.toList()));
             if (!domain.getTypes().containsKey(type.getName())) {
                 domain.addType(type);
             }
         }
 
-        assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();
+        assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText().toLowerCase();
         Type c_type = type;
         ctx.variable().stream().forEach(variable -> {
-            variables.add(new Variable("?" + variable.name().getText(), c_type));
+            variables.add(new Variable("?" + variable.name().getText().toLowerCase(), c_type));
         });
     }
 }

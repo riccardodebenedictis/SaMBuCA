@@ -96,8 +96,8 @@ public class PDDLLanguageParser {
         // We parse the problem..
         PDDLParser.ProblemContext problem_context = problem_parser.problem();
 
-        Domain domain = new Domain(domain_context.name().NAME().getSymbol().getText(), domain_requirements);
-        Problem problem = new Problem(domain, problem_context.name(1).NAME().getSymbol().getText(),
+        Domain domain = new Domain(domain_context.name().NAME().getSymbol().getText().toLowerCase(), domain_requirements);
+        Problem problem = new Problem(domain, problem_context.name(1).NAME().getSymbol().getText().toLowerCase(),
                 problem_requirements);
 
         if (domain_context.types_def() != null) {
@@ -112,21 +112,21 @@ public class PDDLLanguageParser {
                         c_superclass = Type.OBJECT;
                     else if (ctx.type().primitive_type().size() == 1) {
                         c_superclass = ctx.type().primitive_type(0).name() == null ? Type.OBJECT
-                                : domain.getType(ctx.type().primitive_type(0).name().getText());
+                                : domain.getType(ctx.type().primitive_type(0).name().getText().toLowerCase());
                         if (c_superclass == null) {
-                            c_superclass = new Type(ctx.type().primitive_type(0).name().getText());
+                            c_superclass = new Type(ctx.type().primitive_type(0).name().getText().toLowerCase());
                             domain.addType(c_superclass);
                         }
                     } else {
                         c_superclass = new EitherType(ctx.type().primitive_type().stream()
                                 .map(primitive_type -> primitive_type.name() == null ? Type.OBJECT
-                                        : domain.getType(primitive_type.name().getText()))
+                                        : domain.getType(primitive_type.name().getText().toLowerCase()))
                                 .collect(Collectors.toList()));
                         domain.addType(c_superclass);
                     }
                     final Type superclass = c_superclass;
                     ctx.name().forEach(type_name -> {
-                        Type type = new Type(type_name.getText());
+                        Type type = new Type(type_name.getText().toLowerCase());
                         type.setSuperclass(superclass);
                         domain.addType(type);
                     });
@@ -146,19 +146,19 @@ public class PDDLLanguageParser {
                         type = Type.OBJECT;
                     else if (ctx.type().primitive_type().size() == 1)
                         type = ctx.type().primitive_type(0).name() == null ? Type.OBJECT
-                                : domain.getType(ctx.type().primitive_type(0).name().getText());
+                                : domain.getType(ctx.type().primitive_type(0).name().getText().toLowerCase());
                     else {
                         type = new EitherType(ctx.type().primitive_type().stream()
                                 .map(primitive_type -> primitive_type.name() == null ? Type.OBJECT
-                                        : domain.getType(primitive_type.name().getText()))
+                                        : domain.getType(primitive_type.name().getText().toLowerCase()))
                                 .collect(Collectors.toList()));
                         if (!domain.getTypes().containsKey(type.getName()))
                             domain.addType(type);
                     }
 
-                    assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText();
+                    assert type != null : "Cannot find type " + ctx.type().primitive_type(0).name().getText().toLowerCase();
                     Type c_type = type;
-                    ctx.name().stream().forEach(name -> domain.addConstant(c_type.newInstance(name.getText())));
+                    ctx.name().stream().forEach(name -> domain.addConstant(c_type.newInstance(name.getText().toLowerCase())));
                 }
             }, domain_context.constants_def());
         }
@@ -178,7 +178,7 @@ public class PDDLLanguageParser {
                         variables = typedListVariable.variables
                                 .toArray(new Variable[typedListVariable.variables.size()]);
                     }
-                    domain.addPredicate(new Predicate(ctx.predicate().name().getText(), variables));
+                    domain.addPredicate(new Predicate(ctx.predicate().name().getText().toLowerCase(), variables));
                 }
             }, domain_context.predicates_def());
         }
@@ -199,11 +199,11 @@ public class PDDLLanguageParser {
                         function_type = Type.NUMBER;
                     else if (ctx.function_type().type().primitive_type().size() == 1) {
                         function_type = ctx.function_type().type().primitive_type(0).name() == null ? Type.OBJECT
-                                : domain.getType(ctx.function_type().type().primitive_type(0).name().getText());
+                                : domain.getType(ctx.function_type().type().primitive_type(0).name().getText().toLowerCase());
                     } else {
                         function_type = new EitherType(ctx.function_type().type().primitive_type().stream()
                                 .map(primitive_type -> primitive_type.name() == null ? Type.OBJECT
-                                        : domain.getType(primitive_type.name().getText()))
+                                        : domain.getType(primitive_type.name().getText().toLowerCase()))
                                 .collect(Collectors.toList()));
                         domain.addType(function_type);
                     }
@@ -219,7 +219,7 @@ public class PDDLLanguageParser {
                         variables = typedListVariable.variables
                                 .toArray(new Variable[typedListVariable.variables.size()]);
                     }
-                    domain.addFunction(new Function(ctx.function_symbol().name().getText(), function_type, variables));
+                    domain.addFunction(new Function(ctx.function_symbol().name().getText().toLowerCase(), function_type, variables));
                 }
             }, domain_context.functions_def());
         }
@@ -240,7 +240,7 @@ public class PDDLLanguageParser {
                             variables = typedListVariable.variables
                                     .toArray(new Variable[typedListVariable.variables.size()]);
                         }
-                        Action action = new Action(ctx.action_symbol().name().getText(), variables);
+                        Action action = new Action(ctx.action_symbol().name().getText().toLowerCase(), variables);
 
                         TermVisitor term_visitor = new TermVisitor(domain_parser, domain, problem, Stream.of(variables)
                                 .collect(Collectors.toMap(Variable::getName, variable -> variable)));
@@ -263,7 +263,7 @@ public class PDDLLanguageParser {
                             variables = typedListVariable.variables
                                     .toArray(new Variable[typedListVariable.variables.size()]);
                         }
-                        DurativeAction action = new DurativeAction(ctx.da_symbol().name().getText(), variables);
+                        DurativeAction action = new DurativeAction(ctx.da_symbol().name().getText().toLowerCase(), variables);
                         TermVisitor term_visitor = new TermVisitor(domain_parser, domain, problem, Stream.of(variables)
                                 .collect(Collectors.toMap(Variable::getName, variable -> variable)));
                         if (ctx.da_def_body().duration_constraint() != null)
@@ -290,9 +290,9 @@ public class PDDLLanguageParser {
                         type = Type.OBJECT;
                     else if (ctx.type().primitive_type().size() == 1)
                         type = ctx.type().primitive_type(0).name() == null ? Type.OBJECT
-                                : domain.getType(ctx.type().primitive_type(0).name().getText());
+                                : domain.getType(ctx.type().primitive_type(0).name().getText().toLowerCase());
                     final Type c_type = type;
-                    ctx.name().stream().forEach(object -> problem.addObject(c_type.newInstance(object.getText())));
+                    ctx.name().stream().forEach(object -> problem.addObject(c_type.newInstance(object.getText().toLowerCase())));
                 }
             }, problem_context.object_declaration());
         }
