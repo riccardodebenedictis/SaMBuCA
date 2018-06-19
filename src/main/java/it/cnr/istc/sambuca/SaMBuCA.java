@@ -2,6 +2,7 @@ package it.cnr.istc.sambuca;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ public class SaMBuCA {
     private final ProblemInstance pi; // the PDDL problem instance..
     private final List<String> ground_preds = new ArrayList<>(); // the list of all the ground predicates..
     private final List<GAction> actions = new ArrayList<>(); // the list of all the (ground) action..
+    private final double[] goal;
     private final Network nn; // the artificial neural network..
 
     public SaMBuCA(String domain_path, String problem_path) throws IOException {
@@ -52,8 +54,7 @@ public class SaMBuCA {
                             .toArray(new Constant[vars.get(i).getType().getInstances().size()]);
                 for (Constant[] cs : new CartesianProductGenerator<>(cnsts))
                     ground_preds.add("(" + p.getName() + " "
-                            + Stream.of(cs).map(argument -> argument.toString()).collect(Collectors.joining(" "))
-                            + ")");
+                            + Stream.of(cs).map(arg -> arg.getName()).collect(Collectors.joining(" ")) + ")");
             }
         }
 
@@ -81,6 +82,11 @@ public class SaMBuCA {
         for (Term t : pi.getProblem().getInitEls()) {
             init.add(t.toString());
         }
+
+        // this is a representation of the goals..
+        goal = new double[ground_preds.size()];
+        Arrays.fill(goal, 0.5);
+        setGoals(pi.getProblem().getGoal(), goal);
 
         // we create the neural network..
         this.nn = new Network(new CrossEntropy(), new Sigmoid(), ground_preds.size() * 2, ground_preds.size(),
@@ -135,6 +141,28 @@ public class SaMBuCA {
         return resulting_state;
     }
 
+    private void setGoals(Term t, double[] c_goals) {
+        if (t instanceof PredicateTerm) {
+            PredicateTerm pt = (PredicateTerm) t;
+            String trm = "(" + pt.getPredicate().getName() + (pt.getArguments().isEmpty() ? "" : " ")
+                    + pt.getArguments().stream().map(arg -> {
+                        if (arg instanceof ConstantTerm)
+                            return arg.toString();
+                        else
+                            throw new UnsupportedOperationException("Not supported yet.. " + arg.getClass().getName());
+                    }).collect(Collectors.joining(" ")) + ")";
+            for (int i = 0; i < ground_preds.size(); i++) {
+                if (ground_preds.get(i).equals(trm)) {
+                    c_goals[i] = pt.isDirected() ? 1 : 0;
+                    break;
+                }
+            }
+        } else if (t instanceof AndTerm)
+            ((AndTerm) t).getTerms().stream().forEach(trm -> setGoals(trm, c_goals));
+        else
+            throw new UnsupportedOperationException("Not supported yet.. " + t.getClass().getName());
+    }
+
     private GAction getBestAction(Set<String> state) {
         GAction best_action = null;
         double best_q = Double.NEGATIVE_INFINITY;
@@ -145,7 +173,10 @@ public class SaMBuCA {
                 for (int i = 0; i < d_state.length; i++) {
                     d_state[i] = resulting_state.contains(ground_preds.get(i)) ? 1 : 0;
                 }
-                double eval = nn.forward(d_state)[0];
+                double[] x = new double[ground_preds.size() * 2];
+                System.arraycopy(d_state, 0, x, 0, d_state.length);
+                System.arraycopy(goal, 0, x, d_state.length, goal.length);
+                double eval = nn.forward(x)[0];
                 if (eval > best_q) {
                     best_action = a;
                     best_q = eval;
