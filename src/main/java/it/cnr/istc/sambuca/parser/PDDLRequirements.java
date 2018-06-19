@@ -34,22 +34,18 @@ public class PDDLRequirements {
                 }
             }
             if (requirements.containsAll(Arrays.asList(Requirement.EXISTENTIAL_PRECONDITIONS.name,
-                    Requirement.UNIVERSAL_PRECONDITIONS.name))) {
+                    Requirement.UNIVERSAL_PRECONDITIONS.name)))
                 addRequirement(requirements, Requirement.QUANTIFIED_PRECONDITIONS.name);
-            }
             if (requirements
-                    .containsAll(Arrays.asList(Requirement.NUMERIC_FLUENTS.name, Requirement.OBJECT_FLUENTS.name))) {
+                    .containsAll(Arrays.asList(Requirement.NUMERIC_FLUENTS.name, Requirement.OBJECT_FLUENTS.name)))
                 addRequirement(requirements, Requirement.FLUENTS.name);
-            }
             if (requirements.containsAll(Arrays.asList(Requirement.STRIPS.name, Requirement.TYPING.name,
                     Requirement.NEGATIVE_PRECONDITIONS.name, Requirement.DISJUNCTIVE_PRECONDITIONS.name,
                     Requirement.EQUALITY.name, Requirement.QUANTIFIED_PRECONDITIONS.name,
-                    Requirement.CONDITIONAL_EFFECTS.name))) {
+                    Requirement.CONDITIONAL_EFFECTS.name)))
                 addRequirement(requirements, Requirement.ADL.name);
-            }
-            if (requirements.isEmpty()) {
+            if (requirements.isEmpty())
                 addRequirement(requirements, Requirement.STRIPS.name);
-            }
         }
         return requirements;
     }
@@ -73,12 +69,10 @@ public class PDDLRequirements {
             addRequirement(requirements, Requirement.QUANTIFIED_PRECONDITIONS.name);
             addRequirement(requirements, Requirement.CONDITIONAL_EFFECTS.name);
         }
-        if (requirement.equalsIgnoreCase(Requirement.ACTION_COSTS.name)) {
+        if (requirement.equalsIgnoreCase(Requirement.ACTION_COSTS.name))
             addRequirement(requirements, Requirement.NUMERIC_FLUENTS.name);
-        }
-        if (requirement.equalsIgnoreCase(Requirement.GOAL_UTILITIES.name)) {
+        if (requirement.equalsIgnoreCase(Requirement.GOAL_UTILITIES.name))
             addRequirement(requirements, Requirement.PREFERENCES.name);
-        }
     }
 
     enum Requirement {
