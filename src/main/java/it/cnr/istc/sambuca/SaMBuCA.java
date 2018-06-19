@@ -32,14 +32,15 @@ import it.cnr.istc.sambuca.parser.VariableTerm;
  */
 public class SaMBuCA {
 
-    private final ProblemInstance pi;
-    private final Network nn;
+    private final ProblemInstance pi; // the PDDL problem instance..
+    private final List<String> ground_preds = new ArrayList<>(); // the list of all the ground predicates..
+    private final List<GAction> actions = new ArrayList<>(); // the list of all the (ground) action..
+    private final Network nn; // the artificial neural network..
 
     public SaMBuCA(String domain_path, String problem_path) throws IOException {
         this.pi = PDDLLanguageParser.parse(domain_path, problem_path);
 
-        // this is the list of all the ground predicates..
-        List<String> ground_preds = new ArrayList<>();
+        // we fill the list of all the ground predicates..
         for (Predicate p : pi.getDomain().getPredicates().values()) {
             List<Variable> vars = p.getVariables();
             if (vars.isEmpty())
@@ -56,8 +57,7 @@ public class SaMBuCA {
             }
         }
 
-        // this is the list of all the (ground) action..
-        List<GAction> actions = new ArrayList<>();
+        // we fill the list of all the (ground) action..
         for (Action a : pi.getDomain().getActions().values()) {
             List<Variable> vars = a.getVariables();
             if (vars.isEmpty())
@@ -85,6 +85,9 @@ public class SaMBuCA {
         // we create the neural network..
         this.nn = new Network(new CrossEntropy(), new Sigmoid(), ground_preds.size() * 2, ground_preds.size(),
                 ground_preds.size(), 1);
+
+        // we compute the best action according to the current neural network..
+        GAction best_action = getBestAction(init);
     }
 
     private static boolean isSatisfied(Set<String> state, Term t, Map<Variable, Constant> assgnmnt) {
@@ -93,7 +96,7 @@ public class SaMBuCA {
             String trm = "(" + pt.getPredicate().getName() + (pt.getArguments().isEmpty() ? "" : " ")
                     + pt.getArguments().stream().map(arg -> {
                         if (arg instanceof VariableTerm)
-                            return assgnmnt.get(((VariableTerm) arg).getVariable()).toString();
+                            return assgnmnt.get(((VariableTerm) arg).getVariable()).getName();
                         else if (arg instanceof ConstantTerm)
                             return arg.toString();
                         else
@@ -115,7 +118,7 @@ public class SaMBuCA {
             String trm = "(" + pt.getPredicate().getName() + (pt.getArguments().isEmpty() ? "" : " ")
                     + pt.getArguments().stream().map(arg -> {
                         if (arg instanceof VariableTerm)
-                            return assgnmnt.get(((VariableTerm) arg).getVariable()).toString();
+                            return assgnmnt.get(((VariableTerm) arg).getVariable()).getName();
                         else if (arg instanceof ConstantTerm)
                             return arg.toString();
                         else
@@ -130,6 +133,26 @@ public class SaMBuCA {
         else
             throw new UnsupportedOperationException("Not supported yet.. " + t.getClass().getName());
         return resulting_state;
+    }
+
+    private GAction getBestAction(Set<String> state) {
+        GAction best_action = null;
+        double best_q = Double.NEGATIVE_INFINITY;
+        for (GAction a : actions) {
+            if (a.isApplicable(state)) {
+                Set<String> resulting_state = a.apply(state);
+                double[] d_state = new double[ground_preds.size()];
+                for (int i = 0; i < d_state.length; i++) {
+                    d_state[i] = resulting_state.contains(ground_preds.get(i)) ? 1 : 0;
+                }
+                double eval = nn.forward(d_state)[0];
+                if (eval > best_q) {
+                    best_action = a;
+                    best_q = eval;
+                }
+            }
+        }
+        return best_action;
     }
 
     private static class GAction {
