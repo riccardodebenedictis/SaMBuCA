@@ -5,28 +5,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import it.cnr.istc.neon.Network;
 import it.cnr.istc.neon.activation.Sigmoid;
 import it.cnr.istc.neon.error.CrossEntropy;
+import it.cnr.istc.sambuca.State.GAction;
 import it.cnr.istc.sambuca.parser.Action;
 import it.cnr.istc.sambuca.parser.AndTerm;
 import it.cnr.istc.sambuca.parser.Constant;
 import it.cnr.istc.sambuca.parser.ConstantTerm;
-import it.cnr.istc.sambuca.parser.OrTerm;
 import it.cnr.istc.sambuca.parser.PDDLLanguageParser;
 import it.cnr.istc.sambuca.parser.Predicate;
 import it.cnr.istc.sambuca.parser.PredicateTerm;
 import it.cnr.istc.sambuca.parser.ProblemInstance;
 import it.cnr.istc.sambuca.parser.Term;
 import it.cnr.istc.sambuca.parser.Variable;
-import it.cnr.istc.sambuca.parser.VariableTerm;
 
 /**
  * SaMBuCA
@@ -35,8 +32,9 @@ public class SaMBuCA {
 
     private final ProblemInstance pi; // the PDDL problem instance..
     private final List<String> ground_preds = new ArrayList<>(); // the list of all the ground predicates..
-    private final List<GAction> actions = new ArrayList<>(); // the list of all the (ground) action..
-    private final double[] goal;
+    private final List<GAction> actions = new ArrayList<>(); // the list of all the (ground) actions..
+    private final State init; // the initial state..
+    private final double[] goals; // a neural network oriented representation of the current goals..
     private final Network nn; // the artificial neural network..
 
     public SaMBuCA(String domain_path, String problem_path) throws IOException {
@@ -78,15 +76,13 @@ public class SaMBuCA {
         }
 
         // this is the initial state..
-        Set<String> init = new HashSet<>();
-        for (Term t : pi.getProblem().getInitEls()) {
-            init.add(t.toString());
-        }
+        init = new State(null,
+                pi.getProblem().getInitEls().stream().map(ie -> ie.toString()).collect(Collectors.toList()));
 
         // this is a representation of the goals..
-        goal = new double[ground_preds.size()];
-        Arrays.fill(goal, 0.5);
-        setGoals(pi.getProblem().getGoal(), goal);
+        goals = new double[ground_preds.size()];
+        Arrays.fill(goals, 0.5);
+        setGoals(pi.getProblem().getGoal());
 
         // we create the neural network..
         this.nn = new Network(new CrossEntropy(), new Sigmoid(), ground_preds.size() * 2, ground_preds.size(),
@@ -96,52 +92,7 @@ public class SaMBuCA {
         GAction best_action = getBestAction(init);
     }
 
-    private static boolean isSatisfied(Set<String> state, Term t, Map<Variable, Constant> assgnmnt) {
-        if (t instanceof PredicateTerm) {
-            PredicateTerm pt = (PredicateTerm) t;
-            String trm = "(" + pt.getPredicate().getName() + (pt.getArguments().isEmpty() ? "" : " ")
-                    + pt.getArguments().stream().map(arg -> {
-                        if (arg instanceof VariableTerm)
-                            return assgnmnt.get(((VariableTerm) arg).getVariable()).getName();
-                        else if (arg instanceof ConstantTerm)
-                            return arg.toString();
-                        else
-                            throw new UnsupportedOperationException("Not supported yet.. " + arg.getClass().getName());
-                    }).collect(Collectors.joining(" ")) + ")";
-            return pt.isDirected() ? state.contains(trm) : !state.contains(trm);
-        } else if (t instanceof AndTerm)
-            return ((AndTerm) t).getTerms().stream().allMatch(c_t -> isSatisfied(state, c_t, assgnmnt));
-        else if (t instanceof OrTerm)
-            return ((OrTerm) t).getTerms().stream().anyMatch(c_t -> isSatisfied(state, c_t, assgnmnt));
-        else
-            throw new UnsupportedOperationException("Not supported yet.. " + t.getClass().getName());
-    }
-
-    private static Set<String> applyTerm(Set<String> state, Term t, Map<Variable, Constant> assgnmnt,
-            Set<String> resulting_state) {
-        if (t instanceof PredicateTerm) {
-            PredicateTerm pt = (PredicateTerm) t;
-            String trm = "(" + pt.getPredicate().getName() + (pt.getArguments().isEmpty() ? "" : " ")
-                    + pt.getArguments().stream().map(arg -> {
-                        if (arg instanceof VariableTerm)
-                            return assgnmnt.get(((VariableTerm) arg).getVariable()).getName();
-                        else if (arg instanceof ConstantTerm)
-                            return arg.toString();
-                        else
-                            throw new UnsupportedOperationException("Not supported yet.. " + arg.getClass().getName());
-                    }).collect(Collectors.joining(" ")) + ")";
-            if (pt.isDirected())
-                resulting_state.add(trm);
-            else
-                resulting_state.remove(trm);
-        } else if (t instanceof AndTerm)
-            ((AndTerm) t).getTerms().stream().forEach(trm -> applyTerm(state, trm, assgnmnt, resulting_state));
-        else
-            throw new UnsupportedOperationException("Not supported yet.. " + t.getClass().getName());
-        return resulting_state;
-    }
-
-    private void setGoals(Term t, double[] c_goals) {
+    private void setGoals(Term t) {
         if (t instanceof PredicateTerm) {
             PredicateTerm pt = (PredicateTerm) t;
             String trm = "(" + pt.getPredicate().getName() + (pt.getArguments().isEmpty() ? "" : " ")
@@ -153,29 +104,29 @@ public class SaMBuCA {
                     }).collect(Collectors.joining(" ")) + ")";
             for (int i = 0; i < ground_preds.size(); i++) {
                 if (ground_preds.get(i).equals(trm)) {
-                    c_goals[i] = pt.isDirected() ? 1 : 0;
+                    goals[i] = pt.isDirected() ? 1 : 0;
                     break;
                 }
             }
         } else if (t instanceof AndTerm)
-            ((AndTerm) t).getTerms().stream().forEach(trm -> setGoals(trm, c_goals));
+            ((AndTerm) t).getTerms().stream().forEach(trm -> setGoals(trm));
         else
             throw new UnsupportedOperationException("Not supported yet.. " + t.getClass().getName());
     }
 
-    private GAction getBestAction(Set<String> state) {
+    private GAction getBestAction(State state) {
         GAction best_action = null;
         double best_q = Double.NEGATIVE_INFINITY;
         for (GAction a : actions) {
-            if (a.isApplicable(state)) {
-                Set<String> resulting_state = a.apply(state);
+            if (state.isApplicable(a)) {
+                State resulting_state = state.applyAction(a);
                 double[] d_state = new double[ground_preds.size()];
                 for (int i = 0; i < d_state.length; i++) {
                     d_state[i] = resulting_state.contains(ground_preds.get(i)) ? 1 : 0;
                 }
                 double[] x = new double[ground_preds.size() * 2];
                 System.arraycopy(d_state, 0, x, 0, d_state.length);
-                System.arraycopy(goal, 0, x, d_state.length, goal.length);
+                System.arraycopy(goals, 0, x, d_state.length, goals.length);
                 double eval = nn.forward(x)[0];
                 if (eval > best_q) {
                     best_action = a;
@@ -184,24 +135,5 @@ public class SaMBuCA {
             }
         }
         return best_action;
-    }
-
-    private static class GAction {
-
-        private final Action a;
-        private final Map<Variable, Constant> assgnmnt;
-
-        private GAction(Action a, Map<Variable, Constant> assgnmnt) {
-            this.a = a;
-            this.assgnmnt = assgnmnt;
-        }
-
-        private boolean isApplicable(Set<String> state) {
-            return isSatisfied(state, a.getPrecondition(), Collections.unmodifiableMap(assgnmnt));
-        }
-
-        private Set<String> apply(Set<String> state) {
-            return applyTerm(state, a.getEffect(), assgnmnt, new HashSet<>(state));
-        }
     }
 }
